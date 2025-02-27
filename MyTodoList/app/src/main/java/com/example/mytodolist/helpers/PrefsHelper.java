@@ -1,4 +1,4 @@
-package com.example.mytodolist.data;
+package com.example.mytodolist.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -47,48 +47,58 @@ public class PrefsHelper<T> {
     // Save or update a model instance (assumed to have a field "id")
     public boolean saveData(T newModel) {
         try {
+            // Retrieve the "id" field from the newModel object.
             Field idField = newModel.getClass().getDeclaredField("id");
             idField.setAccessible(true);
             Object idValue = idField.get(newModel);
             long newId;
 
+            // If the current id is null or zero, we assign a new id.
             if (idValue == null || (idValue instanceof Number && ((Number) idValue).longValue() == 0)) {
                 long lastId = sharedPreferences.getLong(autoIncrementKey, 0);
                 newId = lastId + 1;
 
                 try {
+                    // Try to get and invoke the setId method.
                     Method setIdMethod = newModel.getClass().getDeclaredMethod("setId", long.class);
+                    setIdMethod.setAccessible(true); // Make it accessible
                     setIdMethod.invoke(newModel, newId);
                 } catch (NoSuchMethodException | InvocationTargetException e) {
-                    idField.set(newModel, newId); // Fallback if setter isn't available
+                    // If setId isn't available, fallback to directly setting the field.
+                    idField.set(newModel, newId);
                 }
+
+                // Update the auto-increment value in SharedPreferences.
                 sharedPreferences.edit().putLong(autoIncrementKey, newId).apply();
             } else {
                 newId = ((Number) idValue).longValue();
             }
 
+            // Retrieve the current list of items.
             List<T> itemList = getAllData();
 
-            // Remove any existing item with the same id
+            // Remove any existing item with the same id.
             itemList.removeIf(item -> {
                 try {
                     Field itemIdField = item.getClass().getDeclaredField("id");
                     itemIdField.setAccessible(true);
                     return ((Number) itemIdField.get(item)).longValue() == newId;
-                } catch (IllegalAccessException | NoSuchFieldException e) {
+                } catch (IllegalAccessException | NoSuchFieldException ex) {
                     return false;
                 }
             });
 
-            // Add the new or updated model
+            // Add the new or updated model.
             itemList.add(newModel);
             String json = gson.toJson(itemList);
             sharedPreferences.edit().putString(entName, json).apply();
+
             return true;
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
+
         return false;
     }
 

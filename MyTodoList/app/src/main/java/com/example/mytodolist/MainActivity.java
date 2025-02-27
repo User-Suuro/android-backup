@@ -9,13 +9,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mytodolist.adapters.ItemTask;
-import com.example.mytodolist.data.PrefsHelper;
+import com.example.mytodolist.helpers.AdapterHelper;
+import com.example.mytodolist.helpers.PrefsHelper;
 import com.example.mytodolist.data.TaskModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
     Button addTaskBtn;
     Dialog dialog;
     RecyclerView recyclerTasks;
-    ItemTask tasksAdapter;
-
+    AdapterHelper<TaskModel> tasksAdapter;
     List<TaskModel> tasks;
 
 
@@ -41,13 +40,23 @@ public class MainActivity extends AppCompatActivity {
         TasksPrefs = new PrefsHelper<>(MainActivity.this, TaskModel.class);
 
         btnOpen = (FloatingActionButton) findViewById(R.id.floatingActionButton);
-        recyclerTasks = (RecyclerView) findViewById(R.id.RecyclerTasks);
-
         btnOpen.setOnClickListener(view -> openModal(view));
+
+        recyclerTasks = (RecyclerView) findViewById(R.id.RecyclerTasks);
         tasks = TasksPrefs.getAllData();
+        tasksAdapter = new AdapterHelper<>(
+                this,
+                tasks,
+                R.layout.adapter_itemtask,
+                ((itemView, task, position) -> {
+                    TextView titleTextView = itemView.findViewById(R.id.TaskTitle);
+                    TextView contentTextView = itemView.findViewById(R.id.TaskContent);
+                    titleTextView.setText(task.getTitle());
+                    contentTextView.setText(task.getContent());
+                })
+        );
 
         recyclerTasks.setLayoutManager(new LinearLayoutManager(this));
-        tasksAdapter = new ItemTask(this, tasks);
         recyclerTasks.setAdapter(tasksAdapter);
     }
 
@@ -90,11 +99,9 @@ public class MainActivity extends AppCompatActivity {
                 if (TasksPrefs.saveData(task)) {
                     Toast.makeText(MainActivity.this, "Successfully Added", Toast.LENGTH_SHORT).show();
                     tasks = TasksPrefs.getAllData(); // update list
-                    tasksAdapter.setTasks(tasks); // Make sure your adapter exposes a method to update its data
-                    tasksAdapter.notifyItemInserted(tasks.size() - 1);
+                    tasksAdapter.reloadItems(tasks); // Make sure your adapter exposes a method to update its data
                     dialog.hide();
                 };
-
             }
         });
 
