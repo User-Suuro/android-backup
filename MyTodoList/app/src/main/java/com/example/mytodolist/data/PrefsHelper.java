@@ -11,87 +11,96 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrefsHelper {
-
+public class PrefsHelper<T> {
     private SharedPreferences sharedPreferences;
     private Gson gson;
     private String entName;           // Key for storing the list (same as the entity name)
     private String autoIncrementKey;  // Key for auto-incrementing IDs
+    private Class<T> model;
 
-    public PrefsHelper(Context context, String entity) {
-        // Use the provided entity as the SharedPreferences name
-        this.sharedPreferences = context.getSharedPreferences(entity, Context.MODE_PRIVATE);
+    public PrefsHelper(Context context, Class<T> modelClass) {
+        this.model = modelClass;
+        this.entName = getEntityNameFromModel();
+        this.sharedPreferences = context.getSharedPreferences(entName, Context.MODE_PRIVATE);
         this.gson = new Gson();
-        this.entName = entity;
-        this.autoIncrementKey = entity + "_auto_increment_id";
+        this.autoIncrementKey = entName + "_auto_increment_id";
     }
 
-    // Retrieve all data for the given model class using the key same as the entity name.
-    public <T> List<T> getAllData(Class<T> cl) {
+    private String getEntityNameFromModel() {
+        try {
+            Field field = model.getField("ENTITY_NAME");
+            return (String) field.get(null); // static field, so pass null as instance
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // If not defined, fallback to the model's simple name.
+            return model.getSimpleName();
+        }
+    }
+
+    // Retrieve all data for the given model using the key (entity name)
+    public List<T> getAllData() {
         String json = sharedPreferences.getString(entName, null);
         if (json == null) return new ArrayList<>();
-        Type listType = TypeToken.getParameterized(List.class, cl).getType();
+        Type listType = TypeToken.getParameterized(List.class, model).getType();
         return gson.fromJson(json, listType);
     }
 
     // Save or update a model instance (assumed to have a field "id")
-    public <T> void saveData(T model) {
+    public boolean saveData(T newModel) {
         try {
-
-            Field idField = model.getClass().getDeclaredField("id");
+            Field idField = newModel.getClass().getDeclaredField("id");
             idField.setAccessible(true);
-            Object idValue = idField.get(model);
+            Object idValue = idField.get(newModel);
             long newId;
 
             if (idValue == null || (idValue instanceof Number && ((Number) idValue).longValue() == 0)) {
-
                 long lastId = sharedPreferences.getLong(autoIncrementKey, 0);
                 newId = lastId + 1;
 
                 try {
-                    Method setIdMethod = model.getClass().getDeclaredMethod("setId", long.class);
-                    setIdMethod.invoke(model, newId);
+                    Method setIdMethod = newModel.getClass().getDeclaredMethod("setId", long.class);
+                    setIdMethod.invoke(newModel, newId);
                 } catch (NoSuchMethodException | InvocationTargetException e) {
-                    idField.set(model, newId); // Fallback if setter isn't available
+                    idField.set(newModel, newId); // Fallback if setter isn't available
                 }
                 sharedPreferences.edit().putLong(autoIncrementKey, newId).apply();
             } else {
                 newId = ((Number) idValue).longValue();
             }
 
+            List<T> itemList = getAllData();
 
-            List<T> taskList = getAllData((Class<T>) model.getClass());
-
-            // Remove any existing task with the same id
-            taskList.removeIf(task -> {
+            // Remove any existing item with the same id
+            itemList.removeIf(item -> {
                 try {
-                    Field taskIdField = task.getClass().getDeclaredField("id");
-                    taskIdField.setAccessible(true);
-                    return ((Number) taskIdField.get(task)).longValue() == newId;
+                    Field itemIdField = item.getClass().getDeclaredField("id");
+                    itemIdField.setAccessible(true);
+                    return ((Number) itemIdField.get(item)).longValue() == newId;
                 } catch (IllegalAccessException | NoSuchFieldException e) {
                     return false;
                 }
             });
 
-            // Add the new or updated task
-            taskList.add(model);
-            String json = gson.toJson(taskList);
+            // Add the new or updated model
+            itemList.add(newModel);
+            String json = gson.toJson(itemList);
             sharedPreferences.edit().putString(entName, json).apply();
+            return true;
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
-    // Retrieve a single task by id
-    public <T> T getTask(Class<T> cl, long id) {
-        List<T> taskList = getAllData(cl);
-        for (T task : taskList) {
+    // Retrieve a single item by id
+    public T getTask(long id) {
+        List<T> itemList = getAllData();
+        for (T item : itemList) {
             try {
-                Field idField = task.getClass().getDeclaredField("id");
+                Field idField = item.getClass().getDeclaredField("id");
                 idField.setAccessible(true);
-                if (((Number) idField.get(task)).longValue() == id) {
-                    return task;
+                if (((Number) idField.get(item)).longValue() == id) {
+                    return item;
                 }
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
@@ -100,20 +109,48 @@ public class PrefsHelper {
         return null;
     }
 
-
-    // Remove a task by id from the list stored under the entity key.
-    public <T> void remove(Class<T> cl, long id) {
-        List<T> taskList = getAllData(cl);
-        taskList.removeIf(task -> {
+    // Update a model instance by id
+    public void update(long id, T updatedModel) {
+        List<T> itemList = getAllData();
+        boolean updated = false;
+        for (int i = 0; i < itemList.size(); i++) {
+            T item = itemList.get(i);
             try {
-                Field idField = task.getClass().getDeclaredField("id");
+                Field idField = item.getClass().getDeclaredField("id");
                 idField.setAccessible(true);
-                return ((Number) idField.get(task)).longValue() == id;
+                long currentId = ((Number) idField.get(item)).longValue();
+                if (currentId == id) {
+                    // Ensure updatedModel carries the same id.
+                    Field updatedIdField = updatedModel.getClass().getDeclaredField("id");
+                    updatedIdField.setAccessible(true);
+                    updatedIdField.set(updatedModel, id);
+                    itemList.set(i, updatedModel);
+                    updated = true;
+                    break;
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        if (updated) {
+            String json = gson.toJson(itemList);
+            sharedPreferences.edit().putString(entName, json).apply();
+        }
+    }
+
+    // Remove an item by id
+    public void remove(long id) {
+        List<T> itemList = getAllData();
+        itemList.removeIf(item -> {
+            try {
+                Field idField = item.getClass().getDeclaredField("id");
+                idField.setAccessible(true);
+                return ((Number) idField.get(item)).longValue() == id;
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 return false;
             }
         });
-        String json = gson.toJson(taskList);
+        String json = gson.toJson(itemList);
         sharedPreferences.edit().putString(entName, json).apply();
     }
 }

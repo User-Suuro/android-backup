@@ -4,13 +4,16 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class TaskModel {
+    public static final String ENTITY_NAME = "Tasks";
     private long id;
+    private String title;
     private String content;
     private Date datetime;
     private Boolean isDone;
 
     private TaskModel(Builder builder) {
         this.id = 0;
+        this.title = builder.title;
         this.content = builder.content;
         this.datetime = builder.datetime;
         this.isDone = builder.isDone;
@@ -26,6 +29,9 @@ public class TaskModel {
     public long getId() {
         return id;
     }
+    public String getTitle() {
+        return title;
+    }
 
     public String getContent() {
         return content;
@@ -39,18 +45,21 @@ public class TaskModel {
         return isDone;
     }
 
+
     // Builder class for optional and required parameters
 
     public static class Builder {
 
         // REQUIRED FIELDS
+        private String title;
         private String content;
 
         // OPTIONAL FIELDS
         private Date datetime = Calendar.getInstance().getTime();
         private Boolean isDone = false;
 
-        public Builder(String content) {
+        public Builder(String title, String content) {
+            this.title = title;
             this.content = content;
         }
 
