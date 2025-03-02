@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -77,7 +78,32 @@ public class AdapterHelper<T> extends RecyclerView.Adapter<AdapterHelper.ViewHol
 
     // Methods
     public void reloadItems(List<T> newItems) {
+        DiffUtil.Callback diffCallback = new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return items != null ? items.size() : 0;
+            }
+
+            @Override
+            public int getNewListSize() {
+                return newItems != null ? newItems.size() : 0;
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                // Customize this logic if you have a unique identifier
+                return items.get(oldItemPosition).equals(newItems.get(newItemPosition));
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                // If your items have more complex state, compare them appropriately
+                return items.get(oldItemPosition).equals(newItems.get(newItemPosition));
+            }
+        };
+
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
         this.items = newItems;
-        notifyDataSetChanged();
+        diffResult.dispatchUpdatesTo(this);
     }
 }
