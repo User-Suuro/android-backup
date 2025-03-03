@@ -1,6 +1,6 @@
-Unfinished:
-ToDoListRedesign
-SariApp
+Unfinished:  
+ToDoListRedesign  
+SariApp  
 
-Note:
-MyToDoList -> Data Persistance Activity
+Note:  
+MyToDoList -> Data Persistance Activity  
