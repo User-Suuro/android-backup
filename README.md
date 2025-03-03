@@ -3,6 +3,6 @@ ToDoListRedesign
 SariApp  
 
 Finished:  
-MyToDoList(Data Persistance Activity)
-AndroidWidgetsToLife
+MyToDoList(Data Persistance Activity)  
+AndroidWidgetsToLife  
 StackHeap  
