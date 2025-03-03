@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/arrow_back"
+                android:scaleType="center"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                >
+
+            </ImageView>
+
+            <TextView
+                android:id="@+id/PageTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="To Do List"
+                android:textSize="@dimen/text_2xl">
+            </TextView>
+        </LinearLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_alignParentBottom="true"
+       >
+
+        <!-- **** Place Your Content Here **** -->
+
+    </FrameLayout>
+
+</RelativeLayout>

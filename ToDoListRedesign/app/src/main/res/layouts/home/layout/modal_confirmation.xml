@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/size_2lg"
+    android:padding="@dimen/size_3lg"
     >
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -16,11 +16,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/alert_circle"
-        />
+        app:srcCompat="@drawable/alert_circle" />
 
     <TextView
-        android:id="@+id/ConfirmationContent"
+        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/size_2xl"
@@ -35,11 +34,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/ConfirmationContent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
         android:layout_marginTop="@dimen/size_2xl"
         >
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:iconPadding="0dp"
@@ -52,14 +50,12 @@
         </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAccept"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Accept"
-            app:cornerRadius="@dimen/size_md"
+            app:cornerRadius="4dp"
             >
-
         </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>

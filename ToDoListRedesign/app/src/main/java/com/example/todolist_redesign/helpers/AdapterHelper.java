@@ -18,12 +18,11 @@ public class AdapterHelper<T> extends RecyclerView.Adapter<AdapterHelper.ViewHol
     private Context context;
     private OnItemClickListener<T> onItemClickListener;
 
-    // Callback interface for binding data
+
     public interface Bindable<T> {
         void bind(View itemView, T item, int position);
     }
 
-    // Callback interface for item clicks
     public interface OnItemClickListener<T> {
         void onItemClick(View itemView, T item, int position);
     }
@@ -35,7 +34,6 @@ public class AdapterHelper<T> extends RecyclerView.Adapter<AdapterHelper.ViewHol
         this.layoutResId = layoutResId;
         this.binder = binder;
     }
-
 
     // Inflate the item layout and create the holder
     @NonNull
@@ -64,19 +62,16 @@ public class AdapterHelper<T> extends RecyclerView.Adapter<AdapterHelper.ViewHol
         return items != null ? items.size() : 0;
     }
 
-    // ViewHolder class to hold item views
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
         }
     }
 
-    // Setters
     public void setOnItemClickListener(OnItemClickListener<T> listener) {
         this.onItemClickListener = listener;
     }
 
-    // Methods
     public void reloadItems(List<T> newItems) {
         DiffUtil.Callback diffCallback = new DiffUtil.Callback() {
             @Override

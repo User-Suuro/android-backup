@@ -6,4 +6,6 @@
     </style>
 
     <style name="Theme.ToDoListRedesign" parent="Base.Theme.ToDoListRedesign" />
+
+
 </resources>

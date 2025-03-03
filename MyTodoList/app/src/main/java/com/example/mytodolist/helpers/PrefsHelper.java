@@ -120,7 +120,7 @@ public class PrefsHelper<T> {
     }
 
     // Update a model instance by id
-    public void update(long id, T updatedModel) {
+    public boolean update(long id, T updatedModel) {
         List<T> itemList = getAllData();
         boolean updated = false;
         for (int i = 0; i < itemList.size(); i++) {
@@ -136,16 +136,20 @@ public class PrefsHelper<T> {
                     updatedIdField.set(updatedModel, id);
                     itemList.set(i, updatedModel);
                     updated = true;
+
                     break;
                 }
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
+                return false;
             }
         }
         if (updated) {
             String json = gson.toJson(itemList);
             sharedPreferences.edit().putString(entName, json).apply();
+            return true;
         }
+        return false;
     }
 
     // Remove an item by id

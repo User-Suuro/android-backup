@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Extra Small Sizes (dp) -->
+    <dimen name="size_xs">1dp</dimen>
+    <dimen name="size_sm">2dp</dimen>
+    <dimen name="size_md">4dp</dimen>
+    <dimen name="size_lg">6dp</dimen>
+    <dimen name="size_xl">8dp</dimen>
+
+    <!-- Small Sizes (dp) -->
+    <dimen name="size_2xs">10dp</dimen>
+    <dimen name="size_2sm">12dp</dimen>
+    <dimen name="size_2md">14dp</dimen>
+    <dimen name="size_2lg">16dp</dimen>
+    <dimen name="size_2xl">20dp</dimen>
+
+    <!-- Medium Sizes (dp) -->
+    <dimen name="size_3xs">24dp</dimen>
+    <dimen name="size_3sm">28dp</dimen>
+    <dimen name="size_3md">32dp</dimen>
+    <dimen name="size_3lg">36dp</dimen>
+    <dimen name="size_3xl">40dp</dimen>
+
+    <!-- Large Sizes (dp) -->
+    <dimen name="size_4xs">44dp</dimen>
+    <dimen name="size_4sm">48dp</dimen>
+    <dimen name="size_4md">56dp</dimen>
+    <dimen name="size_4lg">64dp</dimen>
+    <dimen name="size_4xl">80dp</dimen>
+
+    <!-- Extra Large Sizes (dp) -->
+    <dimen name="size_5xs">96dp</dimen>
+    <dimen name="size_5sm">112dp</dimen>
+    <dimen name="size_5md">128dp</dimen>
+    <dimen name="size_5lg">144dp</dimen>
+    <dimen name="size_5xl">160dp</dimen>
+
+    <!-- Massive Sizes (dp) -->
+    <dimen name="size_6xs">176dp</dimen>
+    <dimen name="size_6sm">192dp</dimen>
+    <dimen name="size_6md">208dp</dimen>
+    <dimen name="size_6lg">224dp</dimen>
+    <dimen name="size_6xl">240dp</dimen>
+
+    <!-- Gigantic Sizes (dp) -->
+    <dimen name="size_7xs">256dp</dimen>
+
+    <!-- Text Sizes (sp) -->
+    <dimen name="text_xs">12sp</dimen>
+    <dimen name="text_sm">14sp</dimen>
+    <dimen name="text_md">16sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">20sp</dimen>
+    <dimen name="text_2xl">24sp</dimen>
+    <dimen name="text_3xl">30sp</dimen>
+    <dimen name="text_4xl">36sp</dimen>
+    <dimen name="text_5xl">48sp</dimen>
+    <dimen name="text_6xl">60sp</dimen>
+    <dimen name="text_7xl">72sp</dimen>
+</resources>

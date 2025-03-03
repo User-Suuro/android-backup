@@ -47,9 +47,8 @@ public class SqliteHelper<T> extends SQLiteOpenHelper {
         try {
             Field field = model.getField("DATABASE_NAME");
             return (String) field.get(null);
-        } catch (Exception e) {
-            throw new IllegalStateException("Model " + model.getSimpleName() +
-                    " must define a public static final String DATABASE_NAME", e);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return "app.db"; // default db
         }
     }
 

@@ -36,6 +36,9 @@ android {
                     "src\\main\\res",
                     "src\\main\\res\\layouts\\auth",
                     "src\\main\\res\\layouts\\home",
+                    "src\\main\\res\\drawables\\launcher",
+                    "src\\main\\res\\drawables\\shapes",
+                    "src\\main\\res\\drawables\\icons",
                 )
             }
         }
