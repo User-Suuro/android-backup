@@ -30,7 +30,6 @@ public class PagerMainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -41,6 +40,7 @@ public class PagerMainFragment extends Fragment {
 
         viewPager = view.findViewById(R.id.viewpager);
         tabLayout = view.findViewById(R.id.tab_layout);
+
 
         // List<Fragment> fragmentList = Arrays.asList(new RecipesFragment(), new ContentFragment());
         // List<String> titleList = Arrays.asList("Recipes", "Desserts");

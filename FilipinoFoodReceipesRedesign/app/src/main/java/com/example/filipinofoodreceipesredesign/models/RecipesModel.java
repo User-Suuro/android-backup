@@ -16,12 +16,14 @@ public class RecipesModel {
 
     // Private constructor that takes a Builder and required fields.
     private RecipesModel(RecipeBuilder builder) {
-        this.id = 0;
+        this.id = builder.id;  // Allowing id to be set via builder
         this.name = builder.name;
         this.description = builder.description;
         this.imageUrl = builder.imageUrl;
         this.favorite = builder.favorite;
         this.category = builder.category;
+
+        // Ensuring immutability
         this.ingredients = Collections.unmodifiableList(new ArrayList<>(builder.ingredients));
         this.steps = Collections.unmodifiableList(new ArrayList<>(builder.steps));
     }
@@ -30,24 +32,31 @@ public class RecipesModel {
     public long getId() {
         return id;
     }
+
     public String getName() {
         return name;
     }
+
     public String getDescription() {
         return description;
     }
+
     public String getImageUrl() {
         return imageUrl;
     }
+
     public List<String> getIngredients() {
         return ingredients;
     }
+
     public List<String> getSteps() {
         return steps;
     }
+
     public boolean isFavorite() {
         return favorite;
     }
+
     public String getCategory() {
         return category;
     }
@@ -55,12 +64,12 @@ public class RecipesModel {
     // Static Builder class.
     public static class RecipeBuilder {
         // REQUIRED
-        private String name;
-        private String description;
-        private String imageUrl;
+        private final String name;
+        private final String description;
 
         // OPTIONAL
-
+        private long id = 0;  // Allowing optional ID initialization
+        private String imageUrl = null;
         private List<String> ingredients = new ArrayList<>();
         private List<String> steps = new ArrayList<>();
         private boolean favorite = false;
@@ -69,7 +78,16 @@ public class RecipesModel {
         public RecipeBuilder(String name, String description) {
             this.name = name;
             this.description = description;
-            // this.imageUrl = imageUrl;
+        }
+
+        public RecipeBuilder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public RecipeBuilder setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+            return this;
         }
 
         public RecipeBuilder setIngredients(List<String> ingredients) {

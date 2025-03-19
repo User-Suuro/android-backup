@@ -2,4 +2,50 @@
     <string name="app_name">Filipino Food Receipes Redesign</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string-array name="names">
+        <item>Adobo</item>
+        <item>Spaghetti Bolognese</item>
+        <item>Chicken Tikka Masala</item>
+        <item>Vegetable Stir Fry</item>
+        <item>Pancakes</item>
+    </string-array>
+
+    <string-array name="category">
+        <item>Adobo</item>
+        <item>Spaghetti Bolognese</item>
+        <item>Chicken Tikka Masala</item>
+        <item>Vegetable Stir Fry</item>
+        <item>Pancakes</item>
+    </string-array>
+
+    <!-- Recipe Descriptions -->
+    <string-array name="descriptions">
+        <item>A savory Filipino dish made with chicken marinated in vinegar and soy sauce.</item>
+        <item>A classic Italian pasta dish with a rich, meaty tomato sauce.</item>
+        <item>A popular Indian dish featuring grilled chicken in a spiced creamy tomato sauce.</item>
+        <item>A healthy and quick dish featuring a mix of colorful vegetables tossed in a savory sauce.</item>
+        <item>Fluffy breakfast pancakes perfect with a drizzle of maple syrup.</item>
+    </string-array>
+
+    <!-- Ingredients (Comma-separated) -->
+    <string-array name="ingredients">
+        <item>Chicken, Vinegar, Soy Sauce, Garlic, Bay Leaves</item>
+        <item>Spaghetti, Ground Beef, Tomato Sauce, Onion, Garlic, Carrot, Celery</item>
+        <item>Chicken, Yogurt, Tomato Puree, Cream, Garlic, Ginger, Spices</item>
+        <item>Broccoli, Bell Peppers, Carrots, Snow Peas, Soy Sauce, Garlic, Ginger</item>
+        <item>Flour, Eggs, Milk, Baking Powder, Salt, Sugar, Butter</item>
+    </string-array>
+
+    <!-- Steps (Semicolon-separated) -->
+    <string-array name="steps">
+        <item>Marinate the chicken.; Simmer until tender.; Serve with rice.</item>
+        <item>Boil the spaghetti.; Sauté the beef with onions and garlic.; Add vegetables and tomato sauce.; Simmer until flavors meld.; Combine with pasta and serve.</item>
+        <item>Marinate the chicken in yogurt and spices.; Grill or bake the chicken until cooked.; Prepare the sauce with tomato puree, cream, and spices.; Combine the chicken with the sauce and simmer.; Serve with rice or naan.</item>
+        <item>Chop the vegetables into bite-sized pieces.; Heat a wok and add garlic and ginger.; Stir fry the vegetables on high heat.; Add soy sauce and toss until evenly coated.; Serve hot over rice or noodles.</item>
+        <item>Mix the dry ingredients in a bowl.; Whisk in eggs and milk until smooth.; Heat a griddle and add butter.; Pour batter and cook until bubbles form, then flip.; Serve with maple syrup and fresh fruit.</item>
+    </string-array>
+
+
 </resources>

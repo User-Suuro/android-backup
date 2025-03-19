@@ -7,11 +7,14 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Prefs<T> {
     private static final String PREF_NAME = "app_prefs";
     private static final String AUTO_INCREMENT_KEY = "auto_increment_";
+    private static final String DYNAMIC_ENUMS_KEY = "dynamic_enums_";
 
     private SharedPreferences sharedPreferences;
     private Gson gson;
@@ -27,14 +30,45 @@ public class Prefs<T> {
 
     private static class EntityWrapper<T> {
         List<T> rows = new ArrayList<>();
-        DynamicValues dynamic_values = new DynamicValues();
     }
 
-    private static class DynamicValues {
-        public List<String> roles = new ArrayList<>();
-        public List<String> categories = new ArrayList<>();
-        public List<String> statuses = new ArrayList<>();
+    // -- CREATE & UPDATE -- //
+
+    private void saveEntityWrapper(EntityWrapper<T> wrapper) {
+        sharedPreferences.edit().putString(entityName, gson.toJson(wrapper)).apply();
     }
+
+    public boolean save(T item) {
+        try {
+            EntityWrapper<T> wrapper = getEntityWrapper();
+            long id = getNextId();
+            setId(item, id);
+            wrapper.rows.add(item);
+            saveEntityWrapper(wrapper);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean update(T item) {
+        try {
+            EntityWrapper<T> wrapper = getEntityWrapper();
+            long id = getId(item);
+            if (id == -1) return false;
+
+            wrapper.rows.removeIf(existingItem -> getId(existingItem) == id);
+            wrapper.rows.add(item);
+            saveEntityWrapper(wrapper);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // -- READ -- //
 
     private EntityWrapper<T> getEntityWrapper() {
         String json = sharedPreferences.getString(entityName, null);
@@ -48,10 +82,6 @@ public class Prefs<T> {
             e.printStackTrace();
             return new EntityWrapper<>();
         }
-    }
-
-    private void saveEntityWrapper(EntityWrapper<T> wrapper) {
-        sharedPreferences.edit().putString(entityName, gson.toJson(wrapper)).apply();
     }
 
     private long getNextId() {
@@ -70,43 +100,18 @@ public class Prefs<T> {
         }
     }
 
-    private void setId(T item, long id) {
-        try {
-            Field idField = item.getClass().getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.setLong(item, id);
-        } catch (Exception ignored) { }
-    }
-
-    public void save(T item) {
-        EntityWrapper<T> wrapper = getEntityWrapper();
-        long  id = getId(item);
-        if (id == -1) {
-            id = getNextId();
-            setId(item, id);
-        }
-
-        long finalId = id;
-        wrapper.rows.removeIf(existingItem -> getId(existingItem) == finalId);
-        wrapper.rows.add(item);
-        saveEntityWrapper(wrapper);
-    }
-
     public List<T> getAll() {
         return getEntityWrapper().rows;
     }
 
     public T getById(long id) {
-        return getEntityWrapper().rows.stream().filter(item -> getId(item) == id).findFirst().orElse(null);
+        for (T item : getAll()) {
+            if (getId(item) == id) return item;
+        }
+        return null;
     }
 
-    public void remove(long id) {
-        EntityWrapper<T> wrapper = getEntityWrapper();
-        wrapper.rows.removeIf(item -> getId(item) == id);
-        saveEntityWrapper(wrapper);
-    }
-
-    public List<T> filterByField(String fieldPath, Object value) { // -> Takes object cause anon data type
+    public List<T> filterByField(String fieldPath, Object value) {
         List<T> filtered = new ArrayList<>();
         for (T item : getAll()) {
             try {
@@ -125,38 +130,81 @@ public class Prefs<T> {
         return filtered;
     }
 
-    // -- ENUMS IMPLEMENTATION -- //
-
-    public void addDynamicValue(String key, String value) {
-        updateDynamicValues(key, value, true);
-    }
-
-    public void removeDynamicValue(String key, String value) {
-        updateDynamicValues(key, value, false);
-    }
-
-    public List<String> getDynamicValuesByKey(String key) {
+    private void setId(T item, long id) {
         try {
-            Field field = DynamicValues.class.getDeclaredField(key);
-            field.setAccessible(true);
-            return (List<String>) field.get(getEntityWrapper().dynamic_values);
+            Field idField = item.getClass().getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.setLong(item, id);
+        } catch (Exception ignored) { }
+    }
+
+    // -- DELETE -- //
+
+    public boolean remove(long id) {
+        try {
+            EntityWrapper<T> wrapper = getEntityWrapper();
+            if (wrapper.rows.removeIf(existingItem -> getId(existingItem) == id)) {
+                saveEntityWrapper(wrapper);
+                return true;
+            }
+            return false;
         } catch (Exception e) {
-            return new ArrayList<>();
+            e.printStackTrace();
+            return false;
         }
     }
 
-    private void updateDynamicValues(String key, String value, boolean add) {
-        EntityWrapper<T> wrapper = getEntityWrapper();
+    // --- ENUM MANAGEMENT --- //
+
+    public <E extends Enum<E>> List<String> getEnumValues(Class<E> enumClass) {
+        List<String> values = new ArrayList<>();
+        for (E value : enumClass.getEnumConstants()) {
+            values.add(value.name());
+        }
+        values.addAll(getDynamicEnumValues(enumClass.getSimpleName())); // Add dynamic values
+        return values;
+    }
+
+    private List<String> getDynamicEnumValues(String key) {
+        Set<String> storedValues = sharedPreferences.getStringSet(DYNAMIC_ENUMS_KEY + key, new HashSet<>());
+        return new ArrayList<>(storedValues);
+    }
+
+    public void addEnumValue(String key, String value) {
+        Set<String> values = new HashSet<>(getDynamicEnumValues(key));
+        values.add(value);
+        sharedPreferences.edit().putStringSet(DYNAMIC_ENUMS_KEY + key, values).apply();
+    }
+
+    public void removeEnumValue(String key, String value) {
+        Set<String> values = new HashSet<>(getDynamicEnumValues(key));
+        values.remove(value);
+        sharedPreferences.edit().putStringSet(DYNAMIC_ENUMS_KEY + key, values).apply();
+    }
+
+    // --- STATIC DATA MANAGEMENT --- //
+
+    public boolean loadStaticData(List<T> staticData) {
         try {
-            Field field = DynamicValues.class.getDeclaredField(key);
-            field.setAccessible(true);
-            List<String> list = (List<String>) field.get(wrapper.dynamic_values);
-            if (add) {
-                if (!list.contains(value)) list.add(value);
-            } else {
-                list.remove(value);
+            EntityWrapper<T> wrapper = getEntityWrapper();
+            List<T> currentData = wrapper.rows;
+
+            // Remove items that are not in staticData
+            currentData.removeIf(existingItem -> staticData.stream()
+                    .noneMatch(staticItem -> getId(existingItem) == getId(staticItem)));
+
+            // Add missing static items
+            for (T item : staticData) {
+                if (currentData.stream().noneMatch(existingItem -> getId(existingItem) == getId(item))) {
+                    currentData.add(item);
+                }
             }
+
             saveEntityWrapper(wrapper);
-        } catch (Exception ignored) { }
+            return true; // Success
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Failure
+        }
     }
 }
