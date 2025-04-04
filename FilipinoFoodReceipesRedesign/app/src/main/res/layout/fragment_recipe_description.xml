@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".pager.RecipeDescription">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/recipe_picture"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_5xl"
+                android:layout_alignParentTop="true"
+                >
+            </ImageView>
+
+            <TextView
+                android:id="@+id/recipe_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/recipe_picture"
+                android:padding="@dimen/size_2xl"
+                android:text="Title" />
+
+            <TextView
+                android:id="@+id/recipe_ingredients_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/size_2xl"
+                android:text="Ingredients"
+                android:layout_below="@id/recipe_title"
+                />
+
+            <LinearLayout
+                android:id="@+id/recipe_ingredients_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/size_2xl"
+                android:layout_below="@id/recipe_ingredients_title"
+                >
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/recipe_directions_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Directions"
+                android:padding="@dimen/size_2xl"
+                android:layout_below="@id/recipe_ingredients_content"
+                />
+
+            <LinearLayout
+                android:id="@+id/recipe_directions_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/size_2xl"
+                android:layout_below="@id/recipe_directions_title"
+                >
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+</FrameLayout>
