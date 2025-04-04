@@ -3,21 +3,20 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-
     <string-array name="names">
-        <item>Adobo</item>
-        <item>Spaghetti Bolognese</item>
-        <item>Chicken Tikka Masala</item>
-        <item>Vegetable Stir Fry</item>
-        <item>Pancakes</item>
+        <item>file:///android_asset/adobo.jpg</item>
+        <item>file:///android_asset/spaghetti.jpeg</item>
+        <item>file:///android_asset/chicken_masala.jpeg</item>
+        <item>file:///android_asset/stir_fry.jpg</item>
+        <item>file:///android_asset/pancake.jpg</item>
     </string-array>
 
     <string-array name="category">
-        <item>Adobo</item>
-        <item>Spaghetti Bolognese</item>
-        <item>Chicken Tikka Masala</item>
-        <item>Vegetable Stir Fry</item>
-        <item>Pancakes</item>
+        <item>Recipe</item>
+        <item>Recipe</item>
+        <item>Recipe</item>
+        <item>Recipe</item>
+        <item>Dessert</item>
     </string-array>
 
     <!-- Recipe Descriptions -->
@@ -47,5 +46,12 @@
         <item>Mix the dry ingredients in a bowl.; Whisk in eggs and milk until smooth.; Heat a griddle and add butter.; Pour batter and cook until bubbles form, then flip.; Serve with maple syrup and fresh fruit.</item>
     </string-array>
 
+    <string-array name="url">
+        <item>file:///android_asset/adobo.jpg</item>
+        <item>file:///android_asset/spaghetti.jpeg</item>
+        <item>file:///android_asset/chicken_masala.jpeg</item>
+        <item>file:///android_asset/stir_fry.jpg</item>
+        <item>file:///android_asset/pancake.jpg</item>
+    </string-array>
 
 </resources>

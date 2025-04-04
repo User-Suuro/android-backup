@@ -18,7 +18,6 @@ public class Recycler<T> extends RecyclerView.Adapter<Recycler.ViewHolder> {
     private Context context;
     private OnItemClickListener<T> onItemClickListener;
 
-
     public interface Bindable<T> {
         void bind(View itemView, T item, int position);
     }
