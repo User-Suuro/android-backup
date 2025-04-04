@@ -20,7 +20,7 @@ import java.util.Map;
 public class Sqlite<T> extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "app.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 1;
     private final String table_name;
     private final Class<T> model;
     private List<String> tableColumns; // Cached column names

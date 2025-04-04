@@ -1,18 +1,16 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+val APP_WRITE_ID = gradleLocalProperties(rootDir).getProperty("APP_WRITE_ID", "");
 
 plugins {
     id("com.android.application")
 }
-
-val APP_WRITE_ID = gradleLocalProperties(rootDir).getProperty("APP_WRITE_ID", "");
-val APP_WRITE_ENDPOINT = gradleLocalProperties(rootDir).getProperty("APP_WRITE_ENDPOINT", "");
 
 android {
     namespace = "com.example.sariapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.sariapp"
+ applicationId = "com.example.sariapp"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
@@ -20,8 +18,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue ("string", "APP_WRITE_ID", "\"" + APP_WRITE_ID + "\"")
-        resValue ("string", "APP_WRITE_ENDPOINT", "\"" + APP_WRITE_ENDPOINT + "\"")
-        resValue ("string", "APP_WRITE_CALLBACK", "\"appwrite-callback-[${APP_WRITE_ENDPOINT}]\"")
+        resValue ("string", "APP_WRITE_CALLBACK", "\"appwrite-callback-${APP_WRITE_ID}\"")
     }
 
     buildTypes {
@@ -43,7 +40,6 @@ android {
 }
 
 dependencies {
-
     // Default
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
@@ -55,8 +51,10 @@ dependencies {
     // Prefs
     implementation("com.google.code.gson:gson:2.8.9")
 
-    // Appwrite
-    implementation ("io.appwrite:sdk-for-android:7.0.0")
+    // Http
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0") // For API calls
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")  // JSON parsing
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1")  // Optional for logging
 
     // Image Loader
     implementation("com.github.bumptech.glide:glide:4.16.0")
