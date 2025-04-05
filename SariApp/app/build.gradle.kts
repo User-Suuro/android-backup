@@ -5,7 +5,7 @@ plugins {
 }
 
 val APP_WRITE_ID = gradleLocalProperties(rootDir).getProperty("APP_WRITE_ID", "");
-val APP_WRITE_ENDPOINT = gradleLocalProperties(rootDir).getProperty("APP_WRITE_ENDPOINT", "");
+
 
 android {
     namespace = "com.example.sariapp"
@@ -20,8 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue ("string", "APP_WRITE_ID", "\"" + APP_WRITE_ID + "\"")
-        resValue ("string", "APP_WRITE_ENDPOINT", "\"" + APP_WRITE_ENDPOINT + "\"")
-        resValue ("string", "APP_WRITE_CALLBACK", "\"appwrite-callback-[${APP_WRITE_ENDPOINT}]\"")
+
     }
 
     buildTypes {
