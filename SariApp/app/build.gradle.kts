@@ -1,6 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-val APP_WRITE_ID = gradleLocalProperties(rootDir).getProperty("APP_WRITE_ID", "");
-
 plugins {
     id("com.android.application")
 }
@@ -10,15 +7,17 @@ android {
     compileSdk = 34
 
     defaultConfig {
- applicationId = "com.example.sariapp"
+        applicationId = "com.example.sariapp"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resValue ("string", "APP_WRITE_ID", "\"" + APP_WRITE_ID + "\"")
-        resValue ("string", "APP_WRITE_CALLBACK", "\"appwrite-callback-${APP_WRITE_ID}\"")
+
+        resValue("string", "PB_URL", "https://suuro.pockethost.io");
+        resValue("string", "PB_ADMIN_EMAIL", "godwingalvez26@gmail.com");
+        resValue("string", "PB_PASSWORD", "anatadare123");
     }
 
     buildTypes {
@@ -35,6 +34,29 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    sourceSets {
+        getByName("main") {
+            res {
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts")
+
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\auth")
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\auth\\layout")
+
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\home")
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\home\\layout")
+
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\products")
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\products\\layout")
+
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\stores")
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\stores\\layout")
+
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\profile")
+                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\profile\\layout")
+
+            }
+        }
+    }
 
 
 }
@@ -48,13 +70,11 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    // Prefs
+    // JSON Parser
     implementation("com.google.code.gson:gson:2.8.9")
 
     // Http
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0") // For API calls
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")  // JSON parsing
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1")  // Optional for logging
+    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Image Loader
     implementation("com.github.bumptech.glide:glide:4.16.0")
