@@ -3,12 +3,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.auth.RegisterFragment">
+    tools:context=".ui.auth.SignupFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/labelRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="Register"
+            android:textSize="@dimen/text_large"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/labelEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelRegister"
+            android:text="Email"
+            android:textSize="@dimen/text_medium"
+            />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/inputEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelEmail"
+            android:hint="Email"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="@dimen/size_small"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/labelPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputEmail"
+            android:text="Password"
+            android:textSize="@dimen/text_medium"
+            />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/inputPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelPassword"
+            android:hint="Password"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawablePadding="@dimen/size_small"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/labelConfirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputPassword"
+            android:text="Confirm Password"
+            android:textSize="@dimen/text_medium"
+            />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/inputConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelConfirm"
+            android:hint="Confirm Password"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawablePadding="@dimen/size_small"
+            />
+
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputConfirm"
+            android:text="Register"
+        />
+
+
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already have account?"
+            android:layout_below="@id/buttonRegister"
+            android:layout_alignParentEnd="true"
+            android:contextClickable="true"
+        />
+
+    </RelativeLayout>
+
+
 
 </FrameLayout>

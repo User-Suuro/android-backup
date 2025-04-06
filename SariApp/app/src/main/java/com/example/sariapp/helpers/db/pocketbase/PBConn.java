@@ -1,9 +1,9 @@
 package com.example.sariapp.helpers.db.pocketbase;
 
+import android.util.Log;
+import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -15,6 +15,7 @@ public class PBConn {
     private static final OkHttpClient client = new OkHttpClient();
     private static PBConn instance; // Singleton instance
     private static String base_url;
+    private String token;
 
     private PBConn() {
         // Private constructor to prevent external instantiation
@@ -39,8 +40,8 @@ public class PBConn {
         try {
             json.put("identity", email);
             json.put("password", password);
-        } catch (Exception e) {
-            callback.onError("Invalid JSON");
+        } catch (JSONException e) {
+            callback.onError("Invalid JSON format");
             return;
         }
 
@@ -58,6 +59,7 @@ public class PBConn {
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.e("PBConn", "Authentication failed", e);
                 callback.onError(e.getMessage());
             }
 
@@ -67,6 +69,10 @@ public class PBConn {
                     callback.onError("Login failed: " + response.code());
                 } else {
                     String responseBody = response.body().string();
+                    if (responseBody.isEmpty()) {
+                        callback.onError("Empty response body");
+                        return;
+                    }
                     try {
                         callback.onSuccess(responseBody);
                     } catch (Exception e) {
@@ -75,5 +81,33 @@ public class PBConn {
                 }
             }
         });
+    }
+
+    // Set token when user is authenticated
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    // Get token when needed
+    public String getToken() {
+        return token;
+    }
+
+    // Check if logged in
+    public boolean isLoggedIn() {
+        return token != null && !token.isEmpty();
+    }
+
+    public OkHttpClient getClient() {
+        return client;
+    }
+
+    public String getBaseUrl() {
+        return base_url;
+    }
+
+    // Optional: log out
+    public void logout() {
+        token = null;
     }
 }

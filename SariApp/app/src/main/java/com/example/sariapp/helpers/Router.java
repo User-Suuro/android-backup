@@ -5,12 +5,28 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class Router {
-    private final FragmentManager fragmentManager;
-    private final int containerId;
+    private static volatile Router instance;
+    private FragmentManager fragmentManager;
+    private int containerId;
 
+
+    // Private constructor to prevent instantiation
     public Router(FragmentManager fragmentManager, int containerId) {
         this.fragmentManager = fragmentManager;
         this.containerId = containerId;
+    }
+
+
+    // Method to get the singleton instance
+    public static Router getInstance(FragmentManager fragmentManager, int containerId) {
+        if (instance == null) {  // First check (performance optimization)
+            synchronized (Router.class) {
+                if (instance == null) {  // Second check (ensure thread safety)
+                    instance = new Router(fragmentManager, containerId);
+                }
+            }
+        }
+        return instance;
     }
 
     // Switch to a new fragment
@@ -41,7 +57,7 @@ public class Router {
                 fragmentManager.beginTransaction().show(previousFragment).commit();
             }
 
-            return previousFragment; // can be used for passing additional param (e.g. return value in fragment)
+            return previousFragment;
         }
 
         return null;
@@ -61,9 +77,18 @@ public class Router {
             FragmentManager.BackStackEntry backStackEntry = fragmentManager.getBackStackEntryAt(backStackCount - 1);
             String tag = backStackEntry.getName();
 
-            return (tag != null) ? tag : "Unnamed Fragment"; // Handle null tag cases
+            return (tag != null) ? tag : "Unnamed Fragment";
         }
 
-        return "None"; // No previous fragment exists
+        return "None";
+    }
+
+    // Method to reset the state (clear internal fields)
+    public static void clear() {
+        if (instance != null) {
+            instance.fragmentManager = null;  // Clear the fragment manager reference
+            instance.containerId = 0;  // Reset container ID
+            instance = null;  // Nullify the instance to allow for garbage collection
+        }
     }
 }

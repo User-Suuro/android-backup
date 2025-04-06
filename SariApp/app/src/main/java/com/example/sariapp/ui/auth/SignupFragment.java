@@ -7,8 +7,20 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.sariapp.R;
+import com.example.sariapp.helpers.db.pocketbase.PBConn;
+import com.example.sariapp.helpers.db.pocketbase.PBCrud;
+import com.example.sariapp.helpers.db.pocketbase.PBTypes.PBCollection;
+import com.example.sariapp.models.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 
 /**
@@ -52,17 +64,65 @@ public class SignupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_signup, container, false);
+        View view = inflater.inflate(R.layout.fragment_signup, container, false);
+
+        EditText emailInput = view.findViewById(R.id.inputEmail);
+        EditText passInput = view.findViewById(R.id.inputPassword);
+        EditText confirmInput = view.findViewById(R.id.inputConfirm);
+
+        Button registerBtn = view.findViewById(R.id.buttonRegister);
+
+        User user = new User.Builder().email(emailInput.toString()).password(passInput.toString()).confirmPassword(confirmInput.toString()).build();
+        PBConn pb = PBConn.getInstance();
+        PBCrud<User> userCRUD = new PBCrud<>(User.class, pb.getClient(), pb.getBaseUrl(), PBCollection.USERS.getName(), pb.getToken());
+
+        registerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = emailInput.getText().toString().trim();
+                String password = passInput.getText().toString().trim();
+                String confirm = confirmInput.getText().toString().trim();
+
+                User user = new User.Builder()
+                        .email(email)
+                        .password(password)
+                        .confirmPassword(confirm)
+                        .build();
+
+                PBConn pb = PBConn.getInstance();
+                PBCrud<User> userCRUD = new PBCrud<>(User.class, pb.getClient(), pb.getBaseUrl(), PBCollection.USERS.getName(), pb.getToken());
+
+                userCRUD.create(user, new PBCrud.Callback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() ->
+                                    Toast.makeText(getActivity(), "Success: " + result, Toast.LENGTH_LONG).show()
+                            );
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() ->
+                                    Toast.makeText(getActivity(), "Error: " + error, Toast.LENGTH_LONG).show()
+                            );
+                        }
+                    }
+                });
+            }
+        });
+
+
+
+        return view;
     }
 
 

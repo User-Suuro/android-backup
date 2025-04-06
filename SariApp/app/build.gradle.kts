@@ -15,9 +15,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        resValue("string", "PB_URL", "https://suuro.pockethost.io");
-        resValue("string", "PB_ADMIN_EMAIL", "godwingalvez26@gmail.com");
-        resValue("string", "PB_PASSWORD", "anatadare123");
     }
 
     buildTypes {
@@ -37,23 +34,24 @@ android {
     sourceSets {
         getByName("main") {
             res {
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts")
-
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\auth")
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\auth\\layout")
-
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\home")
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\home\\layout")
-
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\products")
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\products\\layout")
-
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\stores")
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\stores\\layout")
-
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\profile")
-                srcDirs("src\\main\\res", "src\\main\\res\\layouts\\profile\\layout")
-
+                srcDirs (
+                        "src\\main\\res",
+                        "src\\main\\res\\layouts",
+                        "src\\main\\res\\layouts\\auth",
+                        "src\\main\\res\\layouts\\auth\\layout",
+                        "src\\main\\res\\layouts\\home",
+                        "src\\main\\res\\layouts\\home\\layout",
+                        "src\\main\\res\\layouts\\products",
+                        "src\\main\\res\\layouts\\products\\layout",
+                        "src\\main\\res\\layouts\\stores",
+                        "src\\main\\res\\layouts\\stores\\layout",
+                        "src\\main\\res\\layouts\\profile",
+                        "src\\main\\res\\layouts\\profile\\layout",
+                        "src\\main\\res\\drawables",
+                        "src\\main\\res\\drawables\\icons",
+                        "src\\main\\res\\layouts\\components",
+                        "src\\main\\res\\layouts\\components\\dialog"
+                )
             }
         }
     }

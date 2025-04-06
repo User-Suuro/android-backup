@@ -7,9 +7,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
+
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -17,7 +18,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class PBCrud<T> {
-    private static final Map<Class<?>, PBCrud<?>> INSTANCES = new HashMap<>();
 
     private final Class<T> modelClass;
     private final OkHttpClient client;
@@ -25,7 +25,7 @@ public class PBCrud<T> {
     private final String collectionName;
     private final String authToken;
 
-    private PBCrud(Class<T> modelClass, OkHttpClient client, String baseUrl, String collectionName, String authToken) {
+    public PBCrud(Class<T> modelClass, OkHttpClient client, String baseUrl, String collectionName, String authToken) {
         this.modelClass = modelClass;
         this.client = client;
         this.baseUrl = baseUrl;
@@ -33,96 +33,144 @@ public class PBCrud<T> {
         this.authToken = authToken;
     }
 
-    // Static factory method (Singleton Pattern)
-    public static synchronized <T> PBCrud<T> getInstance(Class<T> cls, OkHttpClient client, String baseUrl, String collectionName, String authToken) {
-        if (!INSTANCES.containsKey(cls)) {
-            PBCrud<T> instance = new PBCrud<>(cls, client, baseUrl, collectionName, authToken);
-            INSTANCES.put(cls, instance);
-        }
-        @SuppressWarnings("unchecked")
-        PBCrud<T> typedInstance = (PBCrud<T>) INSTANCES.get(cls);
-        return typedInstance;
-    }
-
-    // CREATE method
-    public void create(T model) throws IOException {
+    /// CREATE method (Asynchronous)
+    public void create(T model, final Callback callback) {
         JSONObject json = modelToJson(model);
-        RequestBody body = RequestBody.create(json.toString(), MediaType.parse("application/json"));
+
+        RequestBody body = RequestBody.create(
+                json.toString(),
+                MediaType.parse("application/json")
+        );
+
         Request request = new Request.Builder()
-                .url(baseUrl + "api/collections/" + collectionName + "/records")
-                .addHeader("Authorization", "Admin " + authToken)
+                .url(baseUrl + "/api/collections/" + collectionName + "/records?=")
+                .addHeader("Authorization", "Admin" + authToken) // or "Admin", depending on your auth
+                .addHeader("Content-Type", "application/json")
                 .post(body)
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Create failed: " + response.code());
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError("Create failed: " + e.getMessage());
             }
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    callback.onError("Create failed: " + response.body().string());
+                } else {
+                    callback.onSuccess(response.body().string());
+                }
+            }
+        });
     }
 
-    // READ method (Get all records)
-    public String read() throws IOException {
+
+    // READ method (Get all records - Asynchronous)
+    public void read(final Callback callback) {
         Request request = new Request.Builder()
-                .url(baseUrl + "api/collections/" + collectionName + "/records")
+                .url(baseUrl + "/api/collections/" + collectionName + "/records")
                 .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Content-Type", "application/json")
                 .get()
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Read failed: " + response.code());
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError("Read failed: " + e.getMessage());
             }
-            return response.body().string();
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    callback.onError("Read failed: " + response.code());
+                } else {
+                    callback.onSuccess(response.body().string());
+                }
+            }
+        });
     }
 
-    // READ method (Get a specific record by ID)
-    public String read(String recordId) throws IOException {
+    // READ method (Get a specific record by ID - Asynchronous)
+    public void read(String recordId, final Callback callback) {
         Request request = new Request.Builder()
-                .url(baseUrl + "api/collections/" + collectionName + "/records/" + recordId)
+                .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
                 .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Content-Type", "application/json")
                 .get()
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Read failed: " + response.code());
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError("Read failed: " + e.getMessage());
             }
-            return response.body().string();
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    callback.onError("Read failed: " + response.code());
+                } else {
+                    callback.onSuccess(response.body().string());
+                }
+            }
+        });
     }
 
-    // UPDATE method
-    public void update(String recordId, T model) throws IOException {
+    // UPDATE method (Asynchronous)
+    public void update(String recordId, T model, final Callback callback) {
         JSONObject json = modelToJson(model);
         RequestBody body = RequestBody.create(json.toString(), MediaType.parse("application/json"));
         Request request = new Request.Builder()
-                .url(baseUrl + "api/collections/" + collectionName + "/records/" + recordId)
+                .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
                 .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Content-Type", "application/json")
                 .put(body)
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Update failed: " + response.code());
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError("Update failed: " + e.getMessage());
             }
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    callback.onError("Update failed: " + response.code());
+                } else {
+                    callback.onSuccess(response.body().string());
+                }
+            }
+        });
     }
 
-    // DELETE method
-    public void delete(String recordId) throws IOException {
+    // DELETE method (Asynchronous)
+    public void delete(String recordId, final Callback callback) {
         Request request = new Request.Builder()
-                .url(baseUrl + "api/collections/" + collectionName + "/records/" + recordId)
+                .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
                 .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Content-Type", "application/json")
                 .delete()
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Delete failed: " + response.code());
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError("Delete failed: " + e.getMessage());
             }
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    callback.onError("Delete failed: " + response.code());
+                } else {
+                    callback.onSuccess(response.body().string());
+                }
+            }
+        });
     }
 
     // Convert model object to JSON
@@ -134,7 +182,9 @@ public class PBCrud<T> {
                 field.setAccessible(true);
                 try {
                     Object value = field.get(model);
-                    json.put(annotation.value(), value);
+                    if (value != null) {
+                        json.put(annotation.value(), value);
+                    }
                 } catch (JSONException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -142,4 +192,10 @@ public class PBCrud<T> {
         }
         return json;
     }
+
+    public interface Callback {
+        void onSuccess(String result);
+        void onError(String error);
+    }
+
 }
