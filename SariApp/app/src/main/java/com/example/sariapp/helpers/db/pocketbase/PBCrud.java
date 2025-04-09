@@ -25,12 +25,12 @@ public class PBCrud<T> {
     private final String collectionName;
     private final String authToken;
 
-    public PBCrud(Class<T> modelClass, OkHttpClient client, String baseUrl, String collectionName, String authToken) {
+    public PBCrud(Class<T> modelClass, PBConn pb, String collectionName) {
         this.modelClass = modelClass;
-        this.client = client;
-        this.baseUrl = baseUrl;
         this.collectionName = collectionName;
-        this.authToken = authToken;
+        this.client = pb.getClient();
+        this.baseUrl = pb.getBaseUrl();
+        this.authToken = pb.getToken();
     }
 
     /// CREATE method (Asynchronous)

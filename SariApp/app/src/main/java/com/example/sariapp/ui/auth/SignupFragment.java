@@ -78,10 +78,6 @@ public class SignupFragment extends Fragment {
 
         Button registerBtn = view.findViewById(R.id.buttonRegister);
 
-        User user = new User.Builder().email(emailInput.toString()).password(passInput.toString()).confirmPassword(confirmInput.toString()).build();
-        PBConn pb = PBConn.getInstance();
-        PBCrud<User> userCRUD = new PBCrud<>(User.class, pb.getClient(), pb.getBaseUrl(), PBCollection.USERS.getName(), pb.getToken());
-
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,24 +91,27 @@ public class SignupFragment extends Fragment {
                         .confirmPassword(confirm)
                         .build();
 
-                PBConn pb = PBConn.getInstance();
-                PBCrud<User> userCRUD = new PBCrud<>(User.class, pb.getClient(), pb.getBaseUrl(), PBCollection.USERS.getName(), pb.getToken());
-
+                PBCrud<User> userCRUD = new PBCrud<>(User.class,
+                        PBConn.getInstance(),
+                        PBCollection.USERS.getName());
                 userCRUD.create(user, new PBCrud.Callback() {
                     @Override
                     public void onSuccess(String result) {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() ->
-                                    Toast.makeText(getActivity(), "Success: " + result, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(getActivity(),
+                                            "Success: " + result,
+                                            Toast.LENGTH_LONG).show()
                             );
                         }
                     }
-
                     @Override
                     public void onError(String error) {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() ->
-                                    Toast.makeText(getActivity(), "Error: " + error, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(getActivity(),
+                                            "Error: " + error,
+                                            Toast.LENGTH_LONG).show()
                             );
                         }
                     }

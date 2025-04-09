@@ -28,20 +28,20 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        String pb_url = "https://suuro.pockethost.io";
+
         String admin = "godwingalvez26@gmail.com";
         String password = "anatadare123";
 
         pb = PBConn.getInstance();
 
         if (!pb.isLoggedIn()) {
-            authAdmin(pb, admin, password, pb_url);
+            authAdmin(pb, admin, password);
         }
 
         router = Router.getInstance(getSupportFragmentManager(), R.id.auth_container);
     }
 
-    private void authAdmin(PBConn pb, String email, String password, String pb_url) {
+    private void authAdmin(PBConn pb, String email, String password) {
         AlertDialog.Builder loading = new AlertDialog.Builder(AuthActivity.this);
         AlertDialog.Builder error = new AlertDialog.Builder(AuthActivity.this);
 
@@ -58,7 +58,7 @@ public class AuthActivity extends AppCompatActivity {
         progressDialog.show();
 
         new Thread(() -> {
-            pb.authenticateAdmin(email, password, pb_url, new PBConn.Callback() {
+            pb.authenticateAdmin(email, password, new PBConn.Callback() {
                 @Override
                 public void onSuccess(String result) {
                     runOnUiThread(() -> {
