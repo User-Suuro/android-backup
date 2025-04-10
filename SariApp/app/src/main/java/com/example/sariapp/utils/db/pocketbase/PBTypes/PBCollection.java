@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers.db.pocketbase.PBTypes;
+package com.example.sariapp.utils.db.pocketbase.PBTypes;
 
 public enum PBCollection {
     PRODUCTS("products"),

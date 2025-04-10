@@ -3,102 +3,100 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.auth.SignupFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".app.auth.SignupFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Title -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/labelRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:text="Register"
+            android:text="@string/register"
             android:textSize="@dimen/text_large"
             />
 
+        <!-- Email -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/labelEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/labelRegister"
-            android:text="Email"
+            android:text="@string/email"
             android:textSize="@dimen/text_medium"
             />
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/labelEmail"
-            android:hint="Email"
+            android:hint="@string/email"
             android:drawableStart="@drawable/ic_email"
             android:drawablePadding="@dimen/size_small"
-            />
+        />
 
+        <!-- Password -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/labelPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/inputEmail"
-            android:text="Password"
+            android:text="@string/password"
             android:textSize="@dimen/text_medium"
             />
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/labelPassword"
-            android:hint="Password"
-            android:drawableStart="@drawable/ic_lock"
-            android:drawablePadding="@dimen/size_small"
+            app:drawableStart="@drawable/ic_lock"
+            app:startIconContentDescription="@string/password"
             />
 
+        <!-- Confirm Password -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/labelConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/inputPassword"
-            android:text="Confirm Password"
+            android:text="@string/confirm_password"
             android:textSize="@dimen/text_medium"
             />
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputConfirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/labelConfirm"
-            android:hint="Confirm Password"
-            android:drawableStart="@drawable/ic_lock"
-            android:drawablePadding="@dimen/size_small"
-            />
+            app:drawableStart="@drawable/ic_lock"
+            app:startIconContentDescription="@string/confirm_password"
+        />
 
-
+        <!-- Button Register -->
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/inputConfirm"
-            android:text="Register"
+            android:text="@string/register"
         />
-
-
-
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Already have account?"
+            android:text="@string/already_have_account"
             android:layout_below="@id/buttonRegister"
             android:layout_alignParentEnd="true"
             android:contextClickable="true"
         />
 
     </RelativeLayout>
-
-
 
 </FrameLayout>

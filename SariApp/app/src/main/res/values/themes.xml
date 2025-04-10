@@ -8,30 +8,9 @@
     <style name="Theme.SariApp" parent="Base.Theme.SariApp" />
 
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
-        <!-- Primary Colors -->
-        <item name="colorPrimary">@color/muted_violet</item> <!-- Main color for the app -->
-        <item name="colorPrimaryDark">@color/deep_charcoal</item> <!-- Dark shade of primary -->
+    <style name="Theme.MyApp" parent="Theme.MaterialComponents">
 
-        <!-- Status Bar -->
-        <item name="colorAccent">@color/pale_lavender</item> <!-- Accent color for highlights -->
-
-        <!-- Text Colors -->
-        <item name="android:textColorPrimary">@color/deep_charcoal</item> <!-- Primary text -->
-        <item name="android:textColorSecondary">@color/muted_lavender_gray</item> <!-- Secondary text -->
-
-        <!-- Background Colors -->
-        <item name="android:windowBackground">@color/soft_white</item> <!-- Main background color -->
-        <item name="android:windowTranslucentStatus">@color/soft_white</item> <!-- Status bar transparent color -->
-
-        <!-- Button & UI Elements -->
-        <item name="colorButtonNormal">@color/muted_violet</item> <!-- Normal button color -->
-
-        <!-- Borders & Dividers -->
-        <item name="android:divider">@color/light_gray_border</item> <!-- Dividers -->
-
-        <!-- Error -->
-        <item name="colorError">@color/warm_orange_red</item> <!-- Error color -->
     </style>
+
 
 </resources>

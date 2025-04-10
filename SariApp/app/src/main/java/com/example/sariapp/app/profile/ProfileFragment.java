@@ -1,4 +1,4 @@
-package com.example.sariapp.ui.profile;
+package com.example.sariapp.app.profile;
 
 import android.os.Bundle;
 

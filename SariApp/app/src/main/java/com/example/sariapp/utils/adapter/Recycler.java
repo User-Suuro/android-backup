@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers.adapter;
+package com.example.sariapp.utils.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

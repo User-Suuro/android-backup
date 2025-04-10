@@ -1,6 +1,6 @@
-package com.example.sariapp.helpers.db.pocketbase;
+package com.example.sariapp.utils.db.pocketbase;
 
-import com.example.sariapp.helpers.db.pocketbase.PBTypes.PBField;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,12 +24,15 @@ public class PBCrud<T> {
     private final String collectionName;
     private final String authToken;
 
-    public PBCrud(Class<T> modelClass, PBConn pb, String collectionName) {
+    private final String role;
+
+    public PBCrud(Class<T> modelClass, PBAuth pb, String collectionName, String role) {
         this.modelClass = modelClass;
         this.collectionName = collectionName;
         this.client = pb.getClient();
         this.baseUrl = pb.getBaseUrl();
         this.authToken = pb.getToken();
+        this.role = role;
     }
 
     /// CREATE method (Asynchronous)
@@ -44,7 +46,7 @@ public class PBCrud<T> {
 
         Request request = new Request.Builder()
                 .url(baseUrl + "/api/collections/" + collectionName + "/records?=")
-                .addHeader("Authorization", "Admin" + authToken) // or "Admin", depending on your auth
+                .addHeader("Authorization", role + " " + authToken)
                 .addHeader("Content-Type", "application/json")
                 .post(body)
                 .build();
@@ -71,7 +73,7 @@ public class PBCrud<T> {
     public void read(final Callback callback) {
         Request request = new Request.Builder()
                 .url(baseUrl + "/api/collections/" + collectionName + "/records")
-                .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Authorization", role + " " + authToken)
                 .addHeader("Content-Type", "application/json")
                 .get()
                 .build();
@@ -97,7 +99,7 @@ public class PBCrud<T> {
     public void read(String recordId, final Callback callback) {
         Request request = new Request.Builder()
                 .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
-                .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Authorization", role + " " + authToken)
                 .addHeader("Content-Type", "application/json")
                 .get()
                 .build();
@@ -125,7 +127,7 @@ public class PBCrud<T> {
         RequestBody body = RequestBody.create(json.toString(), MediaType.parse("application/json"));
         Request request = new Request.Builder()
                 .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
-                .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Authorization", role + " " + authToken)
                 .addHeader("Content-Type", "application/json")
                 .put(body)
                 .build();
@@ -151,7 +153,7 @@ public class PBCrud<T> {
     public void delete(String recordId, final Callback callback) {
         Request request = new Request.Builder()
                 .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
-                .addHeader("Authorization", "Admin " + authToken)
+                .addHeader("Authorization", role + " " + authToken)
                 .addHeader("Content-Type", "application/json")
                 .delete()
                 .build();

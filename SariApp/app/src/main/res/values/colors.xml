@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <!-- Neutrals -->
-    <color name="soft_white">#FFFFFF</color> <!-- background, card, popover -->
-    <color name="deep_charcoal">#1C1B21</color> <!-- foreground text -->
-    <color name="off_white">#FAFAFA</color> <!-- secondary, accent, muted background -->
-    <color name="light_gray_border">#EAEAEA</color> <!-- border, input -->
-    <color name="pale_lavender">#B0A3D5</color> <!-- ring -->
-    <color name="muted_lavender_gray">#877F9A</color> <!-- muted text -->
 
-    <!-- Main Colors -->
-    <color name="muted_violet">#3E3A4C</color> <!-- primary -->
-    <color name="near_white">#FBFBFB</color> <!-- on-primary, etc. -->
-
-    <!-- Status -->
-    <color name="warm_orange_red">#D64D2B</color> <!-- destructive -->
-
-    <!-- Charts -->
-    <color name="warm_orange_brown">#D7883B</color> <!-- chart-1 -->
-    <color name="cool_teal_blue">#3C93A3</color> <!-- chart-2 -->
-    <color name="soft_indigo">#5B6DA8</color> <!-- chart-3 -->
-    <color name="sunny_yellow">#D9BE4A</color> <!-- chart-4 -->
-    <color name="golden_mustard">#CBA13B</color> <!-- chart-5 -->
 </resources>
 

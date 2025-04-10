@@ -1,4 +1,4 @@
-package com.example.sariapp.ui;
+package com.example.sariapp.app.dashboard;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.example.sariapp.R;
 
-public class MainActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity {
     // go to this activity after auth
     @Override
     protected void onCreate(Bundle savedInstanceState) {

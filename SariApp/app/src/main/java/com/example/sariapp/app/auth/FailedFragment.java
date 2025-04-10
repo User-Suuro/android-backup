@@ -1,4 +1,4 @@
-package com.example.sariapp.ui.auth;
+package com.example.sariapp.app.auth;
 
 import android.os.Bundle;
 

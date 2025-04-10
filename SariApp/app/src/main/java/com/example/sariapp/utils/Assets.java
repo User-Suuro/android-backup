@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers;
+package com.example.sariapp.utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;

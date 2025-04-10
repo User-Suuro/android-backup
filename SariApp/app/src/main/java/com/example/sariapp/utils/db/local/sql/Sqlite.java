@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers.db.local.sql;
+package com.example.sariapp.utils.db.local.sql;
 
 import android.content.ContentValues;
 import android.content.Context;

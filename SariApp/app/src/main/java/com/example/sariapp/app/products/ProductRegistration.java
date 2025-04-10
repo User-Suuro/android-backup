@@ -1,4 +1,4 @@
-package com.example.sariapp.ui.products;
+package com.example.sariapp.app.products;
 
 import android.os.Bundle;
 

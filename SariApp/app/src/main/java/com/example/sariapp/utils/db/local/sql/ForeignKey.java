@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers.db.local.sql;
+package com.example.sariapp.utils.db.local.sql;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

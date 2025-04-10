@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers;
+package com.example.sariapp.utils;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;

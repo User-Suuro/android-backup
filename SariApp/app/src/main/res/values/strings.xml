@@ -1,7 +1,23 @@
 <resources>
     <string name="app_name">SariApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Signup Fragment -->
+    <string name="already_have_account">Already have account?</string>
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+
+    <!-- Verify Fragment-->
+    <string name="go_to_login_string">Go to login</string>
+    <string name="did_not_send">Did not send?</string>
+    <string name="resend">Resend</string>
+    <string name="please_try_again_in">Please try again in:</string>
+    <string name="please_see_your_email_inbox_to_get_your_otp_number">Please see your email inbox to get your OTP Number</string>
+    <string name="your_otp_number_has_been_sent_to">Your OTP Number has been sent to</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-
 
 </resources>

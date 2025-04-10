@@ -1,4 +1,4 @@
-package com.example.sariapp.helpers.adapter;
+package com.example.sariapp.utils.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

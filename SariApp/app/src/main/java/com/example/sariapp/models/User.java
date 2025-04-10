@@ -1,6 +1,6 @@
 package com.example.sariapp.models;
 
-import com.example.sariapp.helpers.db.pocketbase.PBTypes.PBField;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 
 public class User {
 

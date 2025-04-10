@@ -1,7 +1,8 @@
-package com.example.sariapp.ui.auth;
+package com.example.sariapp.app.auth;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -9,18 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.sariapp.R;
-import com.example.sariapp.helpers.db.pocketbase.PBConn;
-import com.example.sariapp.helpers.db.pocketbase.PBCrud;
-import com.example.sariapp.helpers.db.pocketbase.PBTypes.PBCollection;
+import com.example.sariapp.utils.Router;
+import com.example.sariapp.utils.db.pocketbase.PBAuth;
+import com.example.sariapp.utils.db.pocketbase.PBCrud;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
 import com.example.sariapp.models.User;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
+import com.example.sariapp.utils.ui.Dialog;
 
 
 /**
@@ -91,39 +90,49 @@ public class SignupFragment extends Fragment {
                         .confirmPassword(confirm)
                         .build();
 
-                PBCrud<User> userCRUD = new PBCrud<>(User.class,
-                        PBConn.getInstance(),
-                        PBCollection.USERS.getName());
-                userCRUD.create(user, new PBCrud.Callback() {
+                PBCrud<User> registerUser = new PBCrud<>(User.class,
+                        PBAuth.getInstance(),
+                        PBCollection.USERS.getName(),
+                        null
+                );
+
+                FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
+                View loadingView = inflater.inflate(R.layout.dialog_loading, null);
+                View errorView = inflater.inflate(R.layout.dialog_error, null);
+                AlertDialog loadingDialog = Dialog.showLoading(requireActivity(), loadingView);
+
+                registerUser.create(user, new PBCrud.Callback() {
                     @Override
                     public void onSuccess(String result) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() ->
-                                    Toast.makeText(getActivity(),
-                                            "Success: " + result,
-                                            Toast.LENGTH_LONG).show()
-                            );
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                Dialog.exitLoading(loadingDialog);
+
+                                // Navigate to success fragment
+                                Router.getInstance(getParentFragmentManager(), container.getId())
+                                        .switchFragment(VerifyFragment.newInstance(user.getEmail()), false);
+                            });
                         }
                     }
+
                     @Override
                     public void onError(String error) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() ->
-                                    Toast.makeText(getActivity(),
-                                            "Error: " + error,
-                                            Toast.LENGTH_LONG).show()
-                            );
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                Dialog.exitLoading(loadingDialog);
+
+                                // Show error with retry or exit
+                                Dialog.showError(requireActivity(), errorView, "Failed to register: " + error, () -> {
+                                    // Optional: navigate back or retry
+                                    Toast.makeText(requireContext(), "Retry clicked", Toast.LENGTH_SHORT).show();
+                                });
+                            });
                         }
                     }
                 });
             }
         });
 
-
-
         return view;
     }
-
-
-
 }
