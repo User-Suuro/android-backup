@@ -17,6 +17,8 @@
     <string name="please_try_again_in">Please try again in:</string>
     <string name="please_see_your_email_inbox_to_get_your_otp_number">Please see your email inbox to get your OTP Number</string>
     <string name="your_otp_number_has_been_sent_to">Your OTP Number has been sent to</string>
+    <string name="your_account_has_been_successfully_verified">Your account has been successfully verified</string>
+    <string name="go_back_to_login">Go back to login</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 

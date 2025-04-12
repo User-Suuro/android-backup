@@ -20,6 +20,7 @@ import com.example.sariapp.utils.db.pocketbase.PBCrud;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
 import com.example.sariapp.models.User;
 import com.example.sariapp.utils.ui.Dialog;
+import com.google.android.material.textfield.TextInputLayout;
 
 
 /**
@@ -71,9 +72,13 @@ public class SignupFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_signup, container, false);
 
-        EditText emailInput = view.findViewById(R.id.inputEmail);
-        EditText passInput = view.findViewById(R.id.inputPassword);
-        EditText confirmInput = view.findViewById(R.id.inputConfirm);
+        TextInputLayout emailInputLayout = view.findViewById(R.id.inputEmail);
+        TextInputLayout passInputLayout = view.findViewById(R.id.inputPassword);
+        TextInputLayout confirmInputLayout = view.findViewById(R.id.inputConfirm);
+
+        EditText emailInput = emailInputLayout.getEditText();
+        EditText passInput = passInputLayout.getEditText();
+        EditText confirmInput = confirmInputLayout.getEditText();
 
         Button registerBtn = view.findViewById(R.id.buttonRegister);
 

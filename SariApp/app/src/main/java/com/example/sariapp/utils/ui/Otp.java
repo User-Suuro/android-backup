@@ -1,102 +1,117 @@
 package com.example.sariapp.utils.ui;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.text.Editable;
-import android.util.AttributeSet;
-import android.view.ActionMode;
+import android.text.InputFilter;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
-import androidx.appcompat.widget.AppCompatEditText;
+import android.widget.EditText;
 
-import com.example.sariapp.R;
+public class Otp implements TextWatcher, View.OnKeyListener, View.OnFocusChangeListener {
 
-public class Otp extends AppCompatEditText {
-    private float mSpace = 24; //24 dp by default, space between the lines
-    private float mNumChars = 4;
-    private float mLineSpacing = 8; //8dp by default, height of the text from our lines
-    private int mMaxLength = 4;
-    private float mLineStroke = 2;
-    private Paint mLinesPaint;
-    private OnClickListener mClickListener;
+    private final EditText[] editTexts;
+    private final OnOtpCompleteListener listener;
+    private int currentIndex = -1;
+    private boolean suppressChange = false;
+    private boolean callbackTriggered = false;
 
-    public Otp(Context context) {
-        super(context);
+    public Otp(EditText[] editTexts, OnOtpCompleteListener listener) {
+        this.editTexts = editTexts;
+        this.listener = listener;
+
+        for (EditText et : editTexts) {
+            et.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
+            et.setOnKeyListener(this);
+            et.setOnFocusChangeListener(this);
+            et.addTextChangedListener(this);
+        }
     }
 
-    public Otp(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus) {
+            currentIndex = getIndex((EditText) v);
+        }
     }
 
-    public Otp(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context, attrs);
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (suppressChange || currentIndex == -1) return;
+
+        String input = editTexts[currentIndex].getText().toString();
+
+        // Trim input to 1 char if needed
+        if (input.length() > 1) {
+            input = input.substring(0, 1);
+            suppressChange = true;
+            editTexts[currentIndex].setText(input);
+            editTexts[currentIndex].setSelection(1); // Keep cursor in place
+            suppressChange = false;
+        }
+
+        // Auto-move to next field
+        if (!input.isEmpty() && currentIndex < editTexts.length - 1) {
+            editTexts[currentIndex + 1].requestFocus();
+        }
+
+        // Trigger callback only once when last box is filled
+        if (!callbackTriggered && currentIndex == editTexts.length - 1 && !input.isEmpty()) {
+            StringBuilder otp = new StringBuilder();
+            for (EditText et : editTexts) {
+                String text = et.getText().toString();
+                if (text.isEmpty()) return; // Incomplete
+                otp.append(text);
+            }
+
+            callbackTriggered = true;
+            if (listener != null) {
+                listener.onOtpComplete(otp.toString());
+            }
+        }
     }
 
-    private void init(Context context, AttributeSet attrs) {
-        float multi = context.getResources().getDisplayMetrics().density;
-        mLineStroke = multi * mLineStroke;
-        mLinesPaint = new Paint(getPaint());
-        mLinesPaint.setStrokeWidth(mLineStroke);
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN &&
+                keyCode == KeyEvent.KEYCODE_DEL &&
+                v instanceof EditText) {
 
-        setBackgroundResource(0);
-        mSpace = multi * mSpace; //convert to pixels for our density
-        mLineSpacing = multi * mLineSpacing; //convert to pixels for our density
-        mNumChars = mMaxLength;
-
-        super.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // When tapped, move cursor to end of text.
-                setSelection(getText().length());
-                if (mClickListener != null) {
-                    mClickListener.onClick(v);
+            int index = getIndex((EditText) v);
+            if (index > 0) {
+                EditText current = editTexts[index];
+                if (current.getText().toString().isEmpty()) {
+                    editTexts[index - 1].setText("");
+                    editTexts[index - 1].requestFocus();
+                } else {
+                    current.setText("");
                 }
             }
-        });
-    }
-
-    @Override
-    public void setOnClickListener(OnClickListener l) {
-        mClickListener = l;
-    }
-
-    @Override
-    public void setCustomSelectionActionModeCallback(ActionMode.Callback actionModeCallback) {
-        throw new RuntimeException("setCustomSelectionActionModeCallback() not supported.");
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        int availableWidth = getWidth() - getPaddingRight() - getPaddingLeft();
-        float mCharSize;
-        if (mSpace < 0) {
-            mCharSize = (availableWidth / (mNumChars * 2 - 1));
-        } else {
-            mCharSize = (availableWidth - (mSpace * (mNumChars - 1))) / mNumChars;
         }
+        return false;
+    }
 
-        int startX = getPaddingLeft();
-        int bottom = getHeight() - getPaddingBottom();
-
-        //Text Width
-        Editable text = getText();
-        int textLength = text.length();
-        float[] textWidths = new float[textLength];
-        getPaint().getTextWidths(getText(), 0, textLength, textWidths);
-
-        for (int i = 0; i < mNumChars; i++) {
-            canvas.drawLine(startX, bottom, startX + mCharSize, bottom, mLinesPaint);
-            if (getText().length() > i) {
-                float middle = startX + mCharSize / 2;
-                canvas.drawText(text, i, i + 1, middle - textWidths[0] / 2, bottom - mLineSpacing, getPaint());
-            }
-            if (mSpace < 0) {
-                startX += mCharSize * 2;
-            } else {
-                startX += mCharSize + mSpace;
-            }
+    private int getIndex(EditText et) {
+        for (int i = 0; i < editTexts.length; i++) {
+            if (editTexts[i] == et) return i;
         }
+        return -1;
+    }
+
+    public void resetCurrentIndex() {
+        currentIndex = -1;
+        callbackTriggered = false;
+        if (editTexts.length > 0) {
+            editTexts[0].requestFocus();
+        }
+    }
+
+    public interface OnOtpCompleteListener {
+        void onOtpComplete(String otp);
     }
 }

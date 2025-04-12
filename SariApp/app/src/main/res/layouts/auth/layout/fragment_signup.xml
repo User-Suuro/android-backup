@@ -6,97 +6,93 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".app.auth.SignupFragment">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <!-- Title -->
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:id="@+id/labelRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:text="@string/register"
             android:textSize="@dimen/text_large"
-            />
+            android:layout_marginBottom="@dimen/size_medium"
+        />
 
         <!-- Email -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/labelEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/labelRegister"
-            android:text="@string/email"
-            android:textSize="@dimen/text_medium"
-            />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/labelEmail"
+            app:startIconDrawable="@drawable/ic_email"
+            app:startIconContentDescription="@string/email"
+            android:layout_marginBottom="@dimen/size_small"
             android:hint="@string/email"
-            android:drawableStart="@drawable/ic_email"
-            android:drawablePadding="@dimen/size_small"
-        />
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/labelPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/inputEmail"
-            android:text="@string/password"
-            android:textSize="@dimen/text_medium"
-            />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/labelPassword"
-            app:drawableStart="@drawable/ic_lock"
-            app:startIconContentDescription="@string/password"
+            app:startIconDrawable="@drawable/ic_lock"
+            android:layout_marginBottom="@dimen/size_small"
+            android:hint="@string/password"
+            app:endIconMode="password_toggle"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
             />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Confirm Password -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/labelConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/inputPassword"
-            android:text="@string/confirm_password"
-            android:textSize="@dimen/text_medium"
-            />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputConfirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/labelConfirm"
-            app:drawableStart="@drawable/ic_lock"
-            app:startIconContentDescription="@string/confirm_password"
-        />
-
+            app:startIconDrawable="@drawable/ic_lock"
+            android:layout_marginBottom="@dimen/size_medium"
+            android:hint="@string/confirm_password"
+            app:endIconMode="password_toggle"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Button Register -->
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/inputConfirm"
             android:text="@string/register"
-        />
+            android:layout_marginBottom="@dimen/size_medium"
+            app:cornerRadius="@dimen/radius_small"
+            />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/already_have_account"
-            android:layout_below="@id/buttonRegister"
-            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
             android:contextClickable="true"
-        />
+            />
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </FrameLayout>

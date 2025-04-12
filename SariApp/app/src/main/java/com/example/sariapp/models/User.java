@@ -13,7 +13,6 @@ public class User {
     @PBField("passwordConfirm")
     private String passwordConfirm;
 
-
     // Private constructor to be used by Builder
     private User(Builder builder) {
         this.username = builder.username;

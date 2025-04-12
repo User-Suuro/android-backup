@@ -109,8 +109,9 @@ public class PBAuth {
                 try {
                     JSONObject responseJson = new JSONObject(result);
                     String otpId = responseJson.optString("otpId");
+
                     if (!otpId.isEmpty()) {
-                        callback.onSuccess("OTP sent successfully. OTP ID: " + otpId);
+                        callback.onSuccess(otpId);
                     } else {
                         callback.onError("OTP ID not found in the response.");
                     }
@@ -132,7 +133,7 @@ public class PBAuth {
         JSONObject json = new JSONObject();
         try {
             json.put("otpId", otpId);
-            json.put("otp", otp);
+            json.put("password", otp);
         } catch (JSONException e) {
             callback.onError("Invalid JSON format");
             return;
@@ -175,6 +176,7 @@ public class PBAuth {
                 .url(url)
                 .post(body)
                 .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Admin " + token)
                 .build();
 
         client.newCall(request).enqueue(new okhttp3.Callback() {
