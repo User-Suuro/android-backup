@@ -1,4 +1,4 @@
-package com.example.sariapp.utils;
+package com.example.sariapp.utils.ui;
 
 import android.content.Context;
 import android.content.res.AssetManager;

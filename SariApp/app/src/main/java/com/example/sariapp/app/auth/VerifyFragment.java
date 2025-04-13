@@ -13,40 +13,44 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.sariapp.R;
-import com.example.sariapp.utils.Router;
+import com.example.sariapp.utils.ui.Router;
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.ui.Dialog;
 import com.example.sariapp.utils.ui.Otp;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class VerifyFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "user_email";
+    private static final String ARG_PARAM2 = "user_id";
     private static final String TAG = "VerifyFragment";
     private String mParam1;
+    private String mParam2;
     private String otpId;
-
-    private AlertDialog loadingDialog;
-    private View loadingView;
 
     private Button resendButton;
     private TextView resendLabel;
     private boolean otpProcessed = false;
     private boolean isOtpSent = false;  // New flag to track OTP sent state
 
+
     private EditText[] otpFields;
     private Otp sharedOtpWatcher;
 
     public VerifyFragment() {}
 
-    public static VerifyFragment newInstance(String param1) {
+    public static VerifyFragment newInstance(String param1, String param2) {
         VerifyFragment fragment = new VerifyFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,10 +58,10 @@ public class VerifyFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
-        } else {
-            Toast.makeText(getContext(), "Email not provided.", Toast.LENGTH_SHORT).show();
+            mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
         // Restore state if available
@@ -73,8 +77,6 @@ public class VerifyFragment extends Fragment {
 
         TextView emailTextView = view.findViewById(R.id.user_email_placeholder);
         emailTextView.setText(mParam1);
-
-        loadingView = inflater.inflate(R.layout.dialog_loading, null);
 
         TextInputLayout[] inputLayouts = new TextInputLayout[]{
                 view.findViewById(R.id.otpInput01),
@@ -124,7 +126,6 @@ public class VerifyFragment extends Fragment {
 
         // Check if OTP was already sent
         if (!isOtpSent) {
-            loadingDialog = Dialog.showLoading(requireActivity(), loadingView);
             sendOTP(); // Send OTP on view creation only if not already sent
         }
 
@@ -138,30 +139,21 @@ public class VerifyFragment extends Fragment {
                 return;
             }
 
-            if (loadingDialog == null || !loadingDialog.isShowing()) {
-                View loadingView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_loading, null);
-                loadingDialog = Dialog.showLoading(requireActivity(), loadingView);
-            }
+            Dialog.showLoading(getContext());
 
-            PBAuth.getInstance().authWithOTP(otpID, otp, new PBAuth.Callback() {
+            PBAuth.getInstance().authWithOTP(otpID, otp, new PBCallback() {
                 @Override
                 public void onSuccess(String result) {
                     if (!isAdded()) return;
 
                     try {
                         requireActivity().runOnUiThread(() -> {
-                            if (loadingDialog != null) {
-                                Dialog.exitLoading(loadingDialog);
-                            }
 
+                            Dialog.exitLoading();
                             Toast.makeText(getContext(), "OTP Verified!", Toast.LENGTH_SHORT).show();
-                            if (requireActivity() instanceof AuthActivity) {
-                                FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
-                                Router.getInstance(getParentFragmentManager(), container.getId())
-                                        .switchFragment(new SuccessFragment(), false);
-                            } else {
-                                Toast.makeText(getContext(), "Navigation error: Not AuthActivity", Toast.LENGTH_SHORT).show();
-                            }
+                            Router.getInstance(getParentFragmentManager())
+                                    .switchFragment(new SuccessFragment(), false);
+
                         });
                     } catch (IllegalStateException e) {
                         Log.e(TAG, "Fragment not attached when handling OTP success", e);
@@ -180,16 +172,8 @@ public class VerifyFragment extends Fragment {
                             }
 
                             otpProcessed = false;
-
-                            if (loadingDialog != null) {
-                                Dialog.exitLoading(loadingDialog);
-                            }
-
-                            View freshErrorView = LayoutInflater.from(requireContext())
-                                    .inflate(R.layout.dialog_error, null);
-
-                            Dialog.showError(requireActivity(), freshErrorView,
-                                    "Verification failed: " + error, null);
+                            Dialog.exitLoading();
+                            Dialog.showError(getContext(), error, null);
                         });
                     } catch (IllegalStateException e) {
                         Log.e(TAG, "Fragment not attached when handling OTP error", e);
@@ -209,20 +193,26 @@ public class VerifyFragment extends Fragment {
                 return;
             }
 
-            PBAuth.getInstance().requestOTP(mParam1, new PBAuth.Callback() {
+            PBAuth.getInstance().requestOTP(mParam1, new PBCallback() {
                 @Override
-                public void onSuccess(String resultOtpId) {
+                public void onSuccess(String response) {
                     if (!isAdded()) return;
 
                     try {
                         requireActivity().runOnUiThread(() -> {
-                            if (loadingDialog != null && loadingDialog.isShowing()) {
-                                Dialog.exitLoading(loadingDialog);
+
+                            Dialog.exitLoading();
+
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                otpId = jsonResponse.getString("otpId");
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
                             }
 
-                            otpId = resultOtpId;
                             otpProcessed = false;
                             isOtpSent = true;  // Mark OTP as sent
+
                             Log.d(TAG, "OTP sent successfully, ready for new input.");
                         });
                     } catch (IllegalStateException e) {
@@ -236,21 +226,10 @@ public class VerifyFragment extends Fragment {
 
                     try {
                         requireActivity().runOnUiThread(() -> {
-                            if (loadingDialog != null && loadingDialog.isShowing()) {
-                                Dialog.exitLoading(loadingDialog);
-                            }
 
+                            Dialog.exitLoading();
                             otpProcessed = false;
-
-                            View freshErrorView = LayoutInflater.from(requireContext())
-                                    .inflate(R.layout.dialog_error, null);
-
-                            Dialog.showError(requireActivity(), freshErrorView,
-                                    "OTP Failed to send: " + error,
-                                    () -> {
-                                        Toast.makeText(getContext(), "Retrying...", Toast.LENGTH_SHORT).show();
-                                        sendOTP();
-                                    });
+                            Dialog.showError(getContext(), error, null);
                         });
                     } catch (IllegalStateException e) {
                         Log.e(TAG, "Fragment not attached when handling OTP send error", e);
@@ -269,4 +248,5 @@ public class VerifyFragment extends Fragment {
         outState.putBoolean("isOtpSent", isOtpSent);
         outState.putString("otpID", otpId);
     }
+
 }

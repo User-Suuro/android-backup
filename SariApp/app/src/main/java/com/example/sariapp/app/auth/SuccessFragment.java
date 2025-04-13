@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.example.sariapp.R;
-import com.example.sariapp.utils.Router;
+import com.example.sariapp.utils.ui.Router;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +70,7 @@ public class SuccessFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
-                Router.getInstance(getParentFragmentManager(), container.getId())
+                Router.getInstance(getParentFragmentManager())
                         .switchFragment(new LoginFragment(), false);
             }
         });

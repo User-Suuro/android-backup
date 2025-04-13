@@ -1,181 +1,69 @@
 package com.example.sariapp.utils.db.pocketbase;
 
+import android.widget.Toast;
+
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-
-
-import okhttp3.Call;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.net.URLEncoder;
 
 public class PBCrud<T> {
 
-    private final Class<T> modelClass;
-    private final OkHttpClient client;
-    private final String baseUrl;
-    private final String collectionName;
+    private final PBAuth auth = PBAuth.getInstance();
+    private final PBConn conn = PBConn.getInstance();
+    private final String baseUrl = auth.getBaseUrl();
     private final String authToken;
+    private final Class<T> modelClass;
+    private final String collectionName;
 
-    private final String role;
-
-    public PBCrud(Class<T> modelClass, PBAuth pb, String collectionName, String role) {
+    public PBCrud(Class<T> modelClass, String collectionName, String token) {
         this.modelClass = modelClass;
         this.collectionName = collectionName;
-        this.client = pb.getClient();
-        this.baseUrl = pb.getBaseUrl();
-        this.authToken = pb.getToken();
-        this.role = role;
+        this.authToken = token;
     }
 
-    /// CREATE method (Asynchronous)
-    public void create(T model, final Callback callback) {
+    public void create(T model, PBCallback callback) {
         JSONObject json = modelToJson(model);
+        String url = baseUrl + "/api/collections/" + collectionName + "/records";
+        conn.sendPostRequest(url, json, authToken, callback);
+    }
 
-        RequestBody body = RequestBody.create(
-                json.toString(),
-                MediaType.parse("application/json")
-        );
+    public void view(String recordId, PBCallback callback) {
+        String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
+        conn.sendGetRequest(url, authToken, callback);
+    }
 
-        Request request = new Request.Builder()
-                .url(baseUrl + "/api/collections/" + collectionName + "/records?=")
-                .addHeader("Authorization", role + " " + authToken)
-                .addHeader("Content-Type", "application/json")
-                .post(body)
-                .build();
+    public void list(String fieldName, String value, PBCallback callback) {
+        // Create the URL with a filter for the specified field
+        try {
+            String filter = fieldName + "=\"" + value + "\"";
+            String encodedFilter = URLEncoder.encode(filter, "UTF-8");
+            String url = baseUrl + "/api/collections/" + collectionName + "/records?filter=" + encodedFilter;
 
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError("Create failed: " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    callback.onError("Create failed: " + response.body().string());
-                } else {
-                    callback.onSuccess(response.body().string());
-                }
-            }
-        });
+            conn.sendGetRequest(url, authToken, callback);
+        } catch (UnsupportedEncodingException e) {
+            callback.onError("Encoding failed: " + e.getMessage());
+        }
     }
 
 
-    // READ method (Get all records - Asynchronous)
-    public void read(final Callback callback) {
-        Request request = new Request.Builder()
-                .url(baseUrl + "/api/collections/" + collectionName + "/records")
-                .addHeader("Authorization", role + " " + authToken)
-                .addHeader("Content-Type", "application/json")
-                .get()
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError("Read failed: " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    callback.onError("Read failed: " + response.code());
-                } else {
-                    callback.onSuccess(response.body().string());
-                }
-            }
-        });
-    }
-
-    // READ method (Get a specific record by ID - Asynchronous)
-    public void read(String recordId, final Callback callback) {
-        Request request = new Request.Builder()
-                .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
-                .addHeader("Authorization", role + " " + authToken)
-                .addHeader("Content-Type", "application/json")
-                .get()
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError("Read failed: " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    callback.onError("Read failed: " + response.code());
-                } else {
-                    callback.onSuccess(response.body().string());
-                }
-            }
-        });
-    }
-
-    // UPDATE method (Asynchronous)
-    public void update(String recordId, T model, final Callback callback) {
+    public void update(String recordId, T model, PBCallback callback) {
         JSONObject json = modelToJson(model);
-        RequestBody body = RequestBody.create(json.toString(), MediaType.parse("application/json"));
-        Request request = new Request.Builder()
-                .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
-                .addHeader("Authorization", role + " " + authToken)
-                .addHeader("Content-Type", "application/json")
-                .put(body)
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError("Update failed: " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    callback.onError("Update failed: " + response.code());
-                } else {
-                    callback.onSuccess(response.body().string());
-                }
-            }
-        });
+        String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
+        conn.sendPutRequest(url, json,  authToken, callback);
     }
 
-    // DELETE method (Asynchronous)
-    public void delete(String recordId, final Callback callback) {
-        Request request = new Request.Builder()
-                .url(baseUrl + "/api/collections/" + collectionName + "/records/" + recordId)
-                .addHeader("Authorization", role + " " + authToken)
-                .addHeader("Content-Type", "application/json")
-                .delete()
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError("Delete failed: " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    callback.onError("Delete failed: " + response.code());
-                } else {
-                    callback.onSuccess(response.body().string());
-                }
-            }
-        });
+    public void delete(String recordId, PBCallback callback) {
+        String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
+        conn.sendDeleteRequest(url,  authToken, callback);
     }
 
-    // Convert model object to JSON
+
     private JSONObject modelToJson(T model) {
         JSONObject json = new JSONObject();
         for (Field field : modelClass.getDeclaredFields()) {
@@ -188,16 +76,10 @@ public class PBCrud<T> {
                         json.put(annotation.value(), value);
                     }
                 } catch (JSONException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); // You can improve error handling here
                 }
             }
         }
         return json;
     }
-
-    public interface Callback {
-        void onSuccess(String result);
-        void onError(String error);
-    }
-
 }

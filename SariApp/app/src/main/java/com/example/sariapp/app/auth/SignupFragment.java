@@ -2,7 +2,6 @@ package com.example.sariapp.app.auth;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -11,16 +10,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.sariapp.R;
-import com.example.sariapp.utils.Router;
+import com.example.sariapp.utils.ui.Router;
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
 import com.example.sariapp.utils.db.pocketbase.PBCrud;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
-import com.example.sariapp.models.User;
+import com.example.sariapp.models.Users;
 import com.example.sariapp.utils.ui.Dialog;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
@@ -38,6 +40,12 @@ public class SignupFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private final PBAuth auth = PBAuth.getInstance();;
+    EditText emailInput, passInput, confirmInput;
+    TextInputLayout emailInputLayout, passInputLayout, confirmInputLayout;
+    PBCrud<Users> crud = new PBCrud<>(Users.class, PBCollection.USERS.getName(),  auth.getToken());
+
 
     public SignupFragment() {
         // Required empty public constructor
@@ -72,13 +80,13 @@ public class SignupFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_signup, container, false);
 
-        TextInputLayout emailInputLayout = view.findViewById(R.id.inputEmail);
-        TextInputLayout passInputLayout = view.findViewById(R.id.inputPassword);
-        TextInputLayout confirmInputLayout = view.findViewById(R.id.inputConfirm);
+        emailInputLayout = view.findViewById(R.id.inputEmail);
+        passInputLayout = view.findViewById(R.id.inputPassword);
+        confirmInputLayout = view.findViewById(R.id.inputConfirm);
 
-        EditText emailInput = emailInputLayout.getEditText();
-        EditText passInput = passInputLayout.getEditText();
-        EditText confirmInput = confirmInputLayout.getEditText();
+        emailInput = emailInputLayout.getEditText();
+        passInput = passInputLayout.getEditText();
+        confirmInput = confirmInputLayout.getEditText();
 
         Button registerBtn = view.findViewById(R.id.buttonRegister);
 
@@ -89,55 +97,109 @@ public class SignupFragment extends Fragment {
                 String password = passInput.getText().toString().trim();
                 String confirm = confirmInput.getText().toString().trim();
 
-                User user = new User.Builder()
-                        .email(email)
-                        .password(password)
-                        .confirmPassword(confirm)
-                        .build();
-
-                PBCrud<User> registerUser = new PBCrud<>(User.class,
-                        PBAuth.getInstance(),
-                        PBCollection.USERS.getName(),
-                        null
-                );
-
-                FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
-                View loadingView = inflater.inflate(R.layout.dialog_loading, null);
-                View errorView = inflater.inflate(R.layout.dialog_error, null);
-                AlertDialog loadingDialog = Dialog.showLoading(requireActivity(), loadingView);
-
-                registerUser.create(user, new PBCrud.Callback() {
-                    @Override
-                    public void onSuccess(String result) {
-                        if (isAdded()) {
-                            requireActivity().runOnUiThread(() -> {
-                                Dialog.exitLoading(loadingDialog);
-
-                                // Navigate to success fragment
-                                Router.getInstance(getParentFragmentManager(), container.getId())
-                                        .switchFragment(VerifyFragment.newInstance(user.getEmail()), false);
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        if (isAdded()) {
-                            requireActivity().runOnUiThread(() -> {
-                                Dialog.exitLoading(loadingDialog);
-
-                                // Show error with retry or exit
-                                Dialog.showError(requireActivity(), errorView, "Failed to register: " + error, () -> {
-                                    // Optional: navigate back or retry
-                                    Toast.makeText(requireContext(), "Retry clicked", Toast.LENGTH_SHORT).show();
-                                });
-                            });
-                        }
-                    }
-                });
+                Dialog.showLoading(getContext());
+                checkAndHandleExistingUser(email, password, confirm);
             }
         });
 
         return view;
     }
+
+    private void checkAndHandleExistingUser(String email, String password, String confirm) {
+        crud.list("email", email, new PBCallback() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JSONObject res = new JSONObject(result);
+                    if (res.getJSONArray("items").length() > 0) {
+                        JSONObject user = res.getJSONArray("items").getJSONObject(0);
+                        boolean verified = user.optBoolean("verified", true); // fallback to true just in case
+                        String id = user.optString("id");
+
+                        if (!verified) {
+                            deleteUser(id, () -> createUser(email, password, confirm));
+                        } else {
+                            Dialog.exitLoading();
+                            emailInputLayout.setError("Email Already Exists. Please try logging in");
+                        }
+
+                    } else {
+                        createUser(email, password, confirm);
+                    }
+                } catch (JSONException e) {
+                    showError("Error parsing user data.");
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                showError("Failed to check user: " + error);
+            }
+        });
+    }
+
+    private void deleteUser(String id, Runnable onSuccess) {
+        crud.delete(id, new PBCallback() {
+            @Override
+            public void onSuccess(String result) {
+                requireActivity().runOnUiThread(onSuccess);
+            }
+
+            @Override
+            public void onError(String error) {
+                showError("Failed to delete user: " + error);
+            }
+        });
+    }
+
+    private void showError(String message) {
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> {
+                Dialog.exitLoading();
+                Dialog.showError(getContext(), message, () -> {});
+            });
+        }
+    }
+
+    private void createUser(String email, String password, String confirm) {
+        Users users = new Users.Builder()
+                .email(email)
+                .password(password)
+                .confirmPassword(confirm)
+                .build();
+
+        crud.create(users, new PBCallback() {
+            @Override
+            public void onSuccess(String result) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        Dialog.exitLoading();
+
+                        try {
+                            JSONObject jsonResponse = new JSONObject(result);
+                            String userID = jsonResponse.optString("id", null);
+
+                            // Navigate to success fragment
+                            Router.getInstance(getParentFragmentManager())
+                                    .switchFragment(VerifyFragment.newInstance(users.getEmail(), userID), false);
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        Dialog.exitLoading();
+                        Dialog.showError(getContext(), error, null);
+                    });
+                }
+            }
+        });
+    }
+
 }

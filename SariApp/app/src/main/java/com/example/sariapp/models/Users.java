@@ -2,7 +2,7 @@ package com.example.sariapp.models;
 
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 
-public class User {
+public class Users {
 
     @PBField("username")
     private String username;
@@ -14,7 +14,7 @@ public class User {
     private String passwordConfirm;
 
     // Private constructor to be used by Builder
-    private User(Builder builder) {
+    private Users(Builder builder) {
         this.username = builder.username;
         this.email = builder.email;
         this.password = builder.password;
@@ -63,8 +63,8 @@ public class User {
         }
 
         // Build the User object
-        public User build() {
-            return new User(this);
+        public Users build() {
+            return new Users(this);
         }
     }
 
