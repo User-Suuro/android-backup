@@ -17,14 +17,13 @@ public class PBCrud<T> {
     private final PBAuth auth = PBAuth.getInstance();
     private final PBConn conn = PBConn.getInstance();
     private final String baseUrl = auth.getBaseUrl();
-    private final String authToken;
+    private final String authToken = auth.getToken();
     private final Class<T> modelClass;
     private final String collectionName;
 
-    public PBCrud(Class<T> modelClass, String collectionName, String token) {
+    public PBCrud(Class<T> modelClass, String collectionName) {
         this.modelClass = modelClass;
         this.collectionName = collectionName;
-        this.authToken = token;
     }
 
     public void create(T model, PBCallback callback) {
@@ -51,7 +50,6 @@ public class PBCrud<T> {
         }
     }
 
-
     public void update(String recordId, T model, PBCallback callback) {
         JSONObject json = modelToJson(model);
         String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
@@ -62,7 +60,6 @@ public class PBCrud<T> {
         String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
         conn.sendDeleteRequest(url,  authToken, callback);
     }
-
 
     private JSONObject modelToJson(T model) {
         JSONObject json = new JSONObject();

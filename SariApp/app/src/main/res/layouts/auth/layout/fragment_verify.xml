@@ -32,7 +32,7 @@
                 android:id="@+id/user_email_placeholder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/size_medium"
+                android:layout_marginBottom="@dimen/space_medium"
             />
 
             <!-- Go to email account label -->
@@ -43,19 +43,18 @@
             />
 
             <!-- OTP Field -->
-            <!-- OTP Field -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="@dimen/space_medium">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/otpInput01"
-                    android:layout_width="48dp"
+                    android:layout_width="@dimen/size_exLarge"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="@dimen/space_tiny">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -63,14 +62,14 @@
                         android:inputType="number"
                         android:gravity="center"
                         android:maxLength="1"
-                        android:textSize="18sp"/>
+                        android:textSize="@dimen/text_medium"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/otpInput02"
-                    android:layout_width="48dp"
+                    android:layout_width="@dimen/size_exLarge"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="@dimen/space_tiny">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -78,14 +77,14 @@
                         android:inputType="number"
                         android:gravity="center"
                         android:maxLength="1"
-                        android:textSize="18sp"/>
+                        android:textSize="@dimen/text_medium"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/otpInput03"
-                    android:layout_width="48dp"
+                    android:layout_width="@dimen/size_exLarge"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="@dimen/space_tiny">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -93,14 +92,14 @@
                         android:inputType="number"
                         android:gravity="center"
                         android:maxLength="1"
-                        android:textSize="18sp"/>
+                        android:textSize="@dimen/text_medium"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/otpInput04"
-                    android:layout_width="48dp"
+                    android:layout_width="@dimen/size_exLarge"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="@dimen/space_tiny">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -108,14 +107,14 @@
                         android:inputType="number"
                         android:gravity="center"
                         android:maxLength="1"
-                        android:textSize="18sp"/>
+                        android:textSize="@dimen/text_medium"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/otpInput05"
-                    android:layout_width="48dp"
+                    android:layout_width="@dimen/size_exLarge"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="@dimen/space_tiny">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -123,12 +122,12 @@
                         android:inputType="number"
                         android:gravity="center"
                         android:maxLength="1"
-                        android:textSize="18sp"/>
+                        android:textSize="@dimen/text_medium"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/otpInput06"
-                    android:layout_width="48dp"
+                    android:layout_width="@dimen/size_exLarge"
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -137,7 +136,7 @@
                         android:inputType="number"
                         android:gravity="center"
                         android:maxLength="1"
-                        android:textSize="18sp"/>
+                        android:textSize="@dimen/text_medium"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -177,7 +176,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="@dimen/space_tiny"
                         />
 
             </LinearLayout>

@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 
 import com.example.sariapp.R;
 import com.example.sariapp.utils.ui.Router;
@@ -44,8 +43,7 @@ public class SignupFragment extends Fragment {
     private final PBAuth auth = PBAuth.getInstance();;
     EditText emailInput, passInput, confirmInput;
     TextInputLayout emailInputLayout, passInputLayout, confirmInputLayout;
-    PBCrud<Users> crud = new PBCrud<>(Users.class, PBCollection.USERS.getName(),  auth.getToken());
-
+    PBCrud<Users> crud = new PBCrud<>(Users.class, PBCollection.USERS.getName());
 
     public SignupFragment() {
         // Required empty public constructor

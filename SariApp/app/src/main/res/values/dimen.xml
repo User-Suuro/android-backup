@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="size_exLarge">32dp</dimen>
-    <dimen name="size_large">24dp</dimen>
-    <dimen name="size_medium">18dp</dimen>
+    <dimen name="size_exLarge">48dp</dimen>
+    <dimen name="size_large">32dp</dimen>
+    <dimen name="size_medium">24dp</dimen>
     <dimen name="size_small">12dp</dimen>
 
     <dimen name="text_large">24sp</dimen>
     <dimen name="text_medium">18sp</dimen>
     <dimen name="text_small">12sp</dimen>
+
+    <dimen name="space_exLarge">32dp</dimen>
+    <dimen name="space_large">24dp</dimen>
+    <dimen name="space_medium">18dp</dimen>
+    <dimen name="space_small">12dp</dimen>
+    <dimen name="space_exSmall">8dp</dimen>
+    <dimen name="space_tiny">4dp</dimen>
 </resources>
