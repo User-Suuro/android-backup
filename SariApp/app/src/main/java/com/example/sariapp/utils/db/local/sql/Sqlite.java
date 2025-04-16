@@ -29,7 +29,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
     public Sqlite(Context context, Class<T> model) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.model = model;
-        // Use the model's simple name as the table name.
         this.table_name = model.getSimpleName();
         this.tableColumns = new ArrayList<>();
     }
@@ -47,7 +46,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Generate a CREATE TABLE query based on the model's annotated fields.
     private String generateCreateTableQuery(Class<?> modelClass, String tableName) {
         StringBuilder query = new StringBuilder("CREATE TABLE " + tableName + " (");
         Field[] fields = modelClass.getDeclaredFields();
@@ -75,7 +73,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return query.toString();
     }
 
-    // Retrieve all column names from the table using a PRAGMA query.
     private List<String> getTableColumnNames(SQLiteDatabase db) {
         List<String> columns = new ArrayList<>();
         Cursor cursor = db.rawQuery("PRAGMA table_info(" + table_name + ")", null);
@@ -83,8 +80,7 @@ public class Sqlite<T> extends SQLiteOpenHelper {
             while (cursor.moveToNext()) {
                 int index = cursor.getColumnIndex("name");
                 if (index != -1) {
-                    String colName = cursor.getString(index);
-                    columns.add(colName);
+                    columns.add(cursor.getString(index));
                 }
             }
             cursor.close();
@@ -92,7 +88,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return columns;
     }
 
-    // Convert a model instance to ContentValues.
     private ContentValues convertModelToContentValues(Object obj) {
         ContentValues values = new ContentValues();
         if (obj instanceof org.json.JSONObject) {
@@ -101,19 +96,12 @@ public class Sqlite<T> extends SQLiteOpenHelper {
                 for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                     String key = it.next();
                     Object value = jsonObject.get(key);
-                    if (value instanceof Integer) {
-                        values.put(key, (Integer) value);
-                    } else if (value instanceof Long) {
-                        values.put(key, (Long) value);
-                    } else if (value instanceof Float) {
-                        values.put(key, (Float) value);
-                    } else if (value instanceof Double) {
-                        values.put(key, (Double) value);
-                    } else if (value instanceof String) {
-                        values.put(key, (String) value);
-                    } else if (value instanceof Boolean) {
-                        values.put(key, (Boolean) value ? 1 : 0);
-                    }
+                    if (value instanceof Integer) values.put(key, (Integer) value);
+                    else if (value instanceof Long) values.put(key, (Long) value);
+                    else if (value instanceof Float) values.put(key, (Float) value);
+                    else if (value instanceof Double) values.put(key, (Double) value);
+                    else if (value instanceof String) values.put(key, (String) value);
+                    else if (value instanceof Boolean) values.put(key, (Boolean) value ? 1 : 0);
                 }
             } catch (org.json.JSONException e) {
                 e.printStackTrace();
@@ -122,37 +110,24 @@ public class Sqlite<T> extends SQLiteOpenHelper {
             Class<?> clazz = obj.getClass();
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
-                // Use column name from @Column if available.
-                String columnName;
-                if (field.isAnnotationPresent(Column.class)) {
-                    Column col = field.getAnnotation(Column.class);
-                    columnName = col.name();
-                } else {
-                    columnName = field.getName();
-                }
+                String columnName = field.isAnnotationPresent(Column.class)
+                        ? field.getAnnotation(Column.class).name()
+                        : field.getName();
                 try {
                     Object value = field.get(obj);
-                    // For autoincrement primary key, skip if value is 0.
                     if ("id".equalsIgnoreCase(columnName) && (value instanceof Number) && ((Number) value).longValue() == 0) {
                         continue;
                     }
                     if (value == null) continue;
                     if (value instanceof List) {
-                        String json = gson.toJson(value);
-                        values.put(columnName, json);
+                        values.put(columnName, gson.toJson(value));
                     } else if (value instanceof Boolean) {
                         values.put(columnName, ((Boolean) value) ? 1 : 0);
-                    } else if (value instanceof Integer) {
-                        values.put(columnName, (Integer) value);
-                    } else if (value instanceof Long) {
-                        values.put(columnName, (Long) value);
-                    } else if (value instanceof Double) {
-                        values.put(columnName, (Double) value);
-                    } else if (value instanceof String) {
-                        values.put(columnName, (String) value);
-                    } else {
-                        values.put(columnName, value.toString());
-                    }
+                    } else if (value instanceof Integer) values.put(columnName, (Integer) value);
+                    else if (value instanceof Long) values.put(columnName, (Long) value);
+                    else if (value instanceof Double) values.put(columnName, (Double) value);
+                    else if (value instanceof String) values.put(columnName, (String) value);
+                    else values.put(columnName, value.toString());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -161,27 +136,18 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return values;
     }
 
-    // ----------------- CRUD Operations (with passed DB instance) ----------------- //
-
-    // Insert a model instance using the provided db (do not close db).
     public long insert(SQLiteDatabase db, T modelObj) {
-        ContentValues values = convertModelToContentValues(modelObj);
-        return db.insert(table_name, null, values);
+        return db.insert(table_name, null, convertModelToContentValues(modelObj));
     }
 
-    // Update a model instance using the provided db (do not close db).
     public int update(SQLiteDatabase db, T modelObj) {
-        ContentValues values = convertModelToContentValues(modelObj);
-        long id = getIdFromModel(modelObj);
-        return db.update(table_name, values, "id=?", new String[]{String.valueOf(id)});
+        return db.update(table_name, convertModelToContentValues(modelObj), "id=?", new String[]{String.valueOf(getIdFromModel(modelObj))});
     }
 
-    // Delete a model instance using the provided db (do not close db).
     public int delete(SQLiteDatabase db, long id) {
         return db.delete(table_name, "id=?", new String[]{String.valueOf(id)});
     }
 
-    // Retrieve all model instances using a fresh db instance (this one closes db).
     public List<T> getAll() {
         List<T> dataList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -199,7 +165,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return dataList;
     }
 
-    // Overloaded getAll that uses the provided db (does not close it).
     private List<T> getAll(SQLiteDatabase db) {
         List<T> dataList = new ArrayList<>();
         Cursor cursor = db.rawQuery("SELECT * FROM " + table_name, null);
@@ -215,7 +180,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return dataList;
     }
 
-    // Helper to extract the "id" field from the model.
     private long getIdFromModel(T modelObj) {
         try {
             Field idField = model.getDeclaredField("id");
@@ -227,13 +191,12 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return -1;
     }
 
-    // Create an instance of T from the current row of the cursor.
     private T createInstanceFromCursor(Cursor cursor, SQLiteDatabase db) {
         try {
             if (tableColumns.isEmpty()) {
                 tableColumns = getTableColumnNames(db);
             }
-            T instance = model.newInstance();
+            T instance = model.getDeclaredConstructor().newInstance();
             for (String colName : tableColumns) {
                 int colIndex = cursor.getColumnIndex(colName);
                 if (colIndex == -1) continue;
@@ -257,9 +220,7 @@ public class Sqlite<T> extends SQLiteOpenHelper {
                 } else if (fieldType == String.class) {
                     value = cursor.getString(colIndex);
                 } else if (List.class.isAssignableFrom(fieldType)) {
-                    String json = cursor.getString(colIndex);
-                    Type listType = new TypeToken<List<String>>() {}.getType();
-                    value = gson.fromJson(json, listType);
+                    value = gson.fromJson(cursor.getString(colIndex), new TypeToken<List<String>>() {}.getType());
                 } else {
                     value = cursor.getString(colIndex);
                 }
@@ -272,14 +233,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return null;
     }
 
-    // ----------------- Get Unique Values ----------------- //
-
-    /**
-     * Retrieves distinct values from a specified column in the table.
-     *
-     * @param columnName The column to retrieve distinct values from.
-     * @return A list of unique values as Strings.
-     */
     public List<String> getUniqueValues(String columnName) {
         List<String> uniqueValues = new ArrayList<>();
         if (!tableColumns.contains(columnName)) {
@@ -291,8 +244,7 @@ public class Sqlite<T> extends SQLiteOpenHelper {
             while (cursor.moveToNext()) {
                 int index = cursor.getColumnIndex(columnName);
                 if (index != -1) {
-                    String value = cursor.getString(index);
-                    uniqueValues.add(value);
+                    uniqueValues.add(cursor.getString(index));
                 }
             }
             cursor.close();
@@ -301,55 +253,31 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return uniqueValues;
     }
 
-    // ----------------- Load Static Data ----------------- //
-
-    /**
-     * Synchronize static data with the database.
-     * For each static data entry (using "name" as a unique key):
-     *  - Update the row if it exists and has changes.
-     *  - Insert the row if it doesn't exist.
-     *  - Remove rows from the DB that aren't present in the static data.
-     */
     public void loadStaticData(List<T> staticData) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            // Build static data map keyed by "name".
             Map<String, T> staticMap = new HashMap<>();
             for (T item : staticData) {
                 String key = getKey(item);
-                if (key != null) {
-                    staticMap.put(key, item);
-                }
+                if (key != null) staticMap.put(key, item);
             }
-            // Get existing data from the same db instance.
             List<T> existingData = getAll(db);
             Map<String, T> existingMap = new HashMap<>();
             for (T item : existingData) {
                 String key = getKey(item);
-                if (key != null) {
-                    existingMap.put(key, item);
-                }
+                if (key != null) existingMap.put(key, item);
             }
-            // Update or insert static data.
             for (Map.Entry<String, T> entry : staticMap.entrySet()) {
                 String key = entry.getKey();
                 T staticItem = entry.getValue();
                 if (existingMap.containsKey(key)) {
                     T dbItem = existingMap.get(key);
-                    if (isChanged(dbItem, staticItem)) {
-                        update(db, staticItem);
-                    }
-                } else {
-                    insert(db, staticItem);
-                }
+                    if (isChanged(dbItem, staticItem)) update(db, staticItem);
+                } else insert(db, staticItem);
             }
-            // Delete entries not in static data.
             for (Map.Entry<String, T> entry : existingMap.entrySet()) {
-                String key = entry.getKey();
-                if (!staticMap.containsKey(key)) {
-                    T dbItem = entry.getValue();
-                    long id = getIdFromModel(dbItem);
-                    delete(db, id);
+                if (!staticMap.containsKey(entry.getKey())) {
+                    delete(db, getIdFromModel(entry.getValue()));
                 }
             }
         } finally {
@@ -357,7 +285,6 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         }
     }
 
-    // Helper: Extract unique key using the "name" field.
     private String getKey(T modelObj) {
         try {
             Field field = model.getDeclaredField("name");
@@ -370,10 +297,7 @@ public class Sqlite<T> extends SQLiteOpenHelper {
         return null;
     }
 
-    // Helper: Compare two models by converting them to ContentValues.
     private boolean isChanged(T a, T b) {
-        ContentValues valuesA = convertModelToContentValues(a);
-        ContentValues valuesB = convertModelToContentValues(b);
-        return !valuesA.toString().equals(valuesB.toString());
+        return !convertModelToContentValues(a).toString().equals(convertModelToContentValues(b).toString());
     }
 }

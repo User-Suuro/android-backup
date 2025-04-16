@@ -1,7 +1,7 @@
 package com.example.sariapp.utils.db.pocketbase.PBTypes;
 
 public enum PBCollection {
-    PRODUCTS("products"),
+    PRODUCTS(""),
     USERS("users"),
     STORES("stores");
 

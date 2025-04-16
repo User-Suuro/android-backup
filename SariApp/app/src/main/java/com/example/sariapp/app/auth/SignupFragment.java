@@ -110,6 +110,7 @@ public class SignupFragment extends Fragment {
                 try {
                     JSONObject res = new JSONObject(result);
                     if (res.getJSONArray("items").length() > 0) {
+
                         JSONObject user = res.getJSONArray("items").getJSONObject(0);
                         boolean verified = user.optBoolean("verified", true); // fallback to true just in case
                         String id = user.optString("id");

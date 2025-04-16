@@ -1,4 +1,4 @@
-package com.example.sariapp.app.auth;
+package com.example.sariapp.app;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,8 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.sariapp.R;
+import com.example.sariapp.app.auth.FailedFragment;
+import com.example.sariapp.app.auth.SignupFragment;
 import com.example.sariapp.utils.ui.Router;
 
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
@@ -25,7 +27,9 @@ public class AuthActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
+        getSupportActionBar().hide();
 
+        // temporarily use admin token for users registration
         String admin = "godwingalvez26@gmail.com";
         String password = "anatadare123";
 

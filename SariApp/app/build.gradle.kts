@@ -28,9 +28,10 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     sourceSets {
         getByName("main") {
             res {
@@ -38,19 +39,19 @@ android {
                         "src\\main\\res",
                         "src\\main\\res\\layouts",
                         "src\\main\\res\\layouts\\auth",
-                        "src\\main\\res\\layouts\\auth\\layout",
+
                         "src\\main\\res\\layouts\\home",
-                        "src\\main\\res\\layouts\\home\\layout",
-                        "src\\main\\res\\layouts\\products",
-                        "src\\main\\res\\layouts\\products\\layout",
-                        "src\\main\\res\\layouts\\stores",
-                        "src\\main\\res\\layouts\\stores\\layout",
-                        "src\\main\\res\\layouts\\profile",
-                        "src\\main\\res\\layouts\\profile\\layout",
+                        "src\\main\\res\\layouts\\home\\products",
+                        "src\\main\\res\\layouts\\home\\stores",
+
+                        "src\\main\\res\\layouts\\more",
+                        "src\\main\\res\\layouts\\discover",
+
+                        "src\\main\\res\\layouts\\components",
+                        "src\\main\\res\\layouts\\components\\dialog",
+                        "src\\main\\res\\layouts\\components\\item",
                         "src\\main\\res\\drawables",
                         "src\\main\\res\\drawables\\icons",
-                        "src\\main\\res\\layouts\\components",
-                        "src\\main\\res\\layouts\\components\\dialog"
                 )
             }
         }
@@ -78,6 +79,9 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
+    // Icon animation
+    implementation("com.airbnb.android:lottie:6.6.6")
+    
     // Barcode
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

@@ -16,14 +16,13 @@
         android:theme="@style/Theme.SariApp"
         tools:targetApi="31" >
         <activity
-            android:name=".app.dashboard.DashboardActivity"
+            android:name=".app.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".app.auth.AuthActivity"
+            android:name=".app.AuthActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

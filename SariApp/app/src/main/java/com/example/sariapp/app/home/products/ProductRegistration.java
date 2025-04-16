@@ -1,4 +1,4 @@
-package com.example.sariapp.app.products;
+package com.example.sariapp.app.home.products;
 
 import android.os.Bundle;
 
@@ -61,6 +61,6 @@ public class ProductRegistration extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_registration, container, false);
+        return inflater.inflate(R.layout.fragment_product_registration, container, false);
     }
 }

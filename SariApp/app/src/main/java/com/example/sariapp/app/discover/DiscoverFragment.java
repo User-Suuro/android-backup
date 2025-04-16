@@ -1,4 +1,4 @@
-package com.example.sariapp.app.auth;
+package com.example.sariapp.app.discover;
 
 import android.os.Bundle;
 
@@ -7,19 +7,15 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 
 import com.example.sariapp.R;
-import com.example.sariapp.app.AuthActivity;
-import com.example.sariapp.utils.ui.Router;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link SuccessFragment#newInstance} factory method to
+ * Use the {@link DiscoverFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SuccessFragment extends Fragment {
+public class DiscoverFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -30,7 +26,7 @@ public class SuccessFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public SuccessFragment() {
+    public DiscoverFragment() {
         // Required empty public constructor
     }
 
@@ -40,11 +36,11 @@ public class SuccessFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment SuccessFragment.
+     * @return A new instance of fragment DiscoverFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SuccessFragment newInstance(String param1, String param2) {
-        SuccessFragment fragment = new SuccessFragment();
+    public static DiscoverFragment newInstance(String param1, String param2) {
+        DiscoverFragment fragment = new DiscoverFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -65,17 +61,6 @@ public class SuccessFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_success, container, false);
-        Button btnGoBack = view.findViewById(R.id.goLoginBtn);
-        btnGoBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
-                Router.getInstance(getParentFragmentManager())
-                        .switchFragment(new LoginFragment(), false);
-            }
-        });
-
-        return view;
+        return inflater.inflate(R.layout.fragment_discover, container, false);
     }
 }
