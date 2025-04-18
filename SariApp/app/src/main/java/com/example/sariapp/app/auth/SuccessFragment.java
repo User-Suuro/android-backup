@@ -72,7 +72,7 @@ public class SuccessFragment extends Fragment {
             public void onClick(View view) {
                 FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
                 Router.getInstance(getParentFragmentManager())
-                        .switchFragment(new LoginFragment(), false);
+                        .switchFragment(new LoginFragment(), false, R.id.auth_container);
             }
         });
 

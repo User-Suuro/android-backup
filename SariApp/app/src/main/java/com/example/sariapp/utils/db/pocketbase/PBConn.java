@@ -99,9 +99,6 @@ public class PBConn {
 
         executeRequest(builder.build(), callback);
     }
-
-
-
     public OkHttpClient getClient() {
         return client;
     }

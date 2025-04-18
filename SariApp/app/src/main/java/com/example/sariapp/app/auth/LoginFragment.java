@@ -90,20 +90,17 @@ public class LoginFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 String email = emailInput.getText().toString().trim();
                 String password = passInput.getText().toString().trim();
                 login(email, password);
             }
         });
 
-
         TextView goLoginText = view.findViewById(R.id.clickableRegisterLabel);
         goLoginText.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
-                Router.getInstance(getFragmentManager()).switchFragment(new SignupFragment(), false);
+                Router.getInstance(getFragmentManager()).switchFragment(new SignupFragment(), false, R.id.auth_container);
             }
         });
 
@@ -118,31 +115,39 @@ public class LoginFragment extends Fragment {
         auth.loginUser(email, password, new PBCallback() {
             @Override
             public void onSuccess(String result) {
-                try {
-                    // Get the token from the response (assuming it's in the response)
-                    JSONObject jsonResponse = new JSONObject(result);
-                    String token = jsonResponse.optString("token");
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        try {
+                            // Parse the JSON response
+                            JSONObject jsonResponse = new JSONObject(result);
+                            String token = jsonResponse.optString("token");
 
-                    // Save the token to PBAuth singleton
-                    PBSession.getInstance().setToken(token);
-                    PBSession.getInstance().setRecord(jsonResponse.getJSONObject("record"));
+                            // Save the token and record to PBSession singleton
+                            PBSession.getUserInstance(getContext()).setToken(token);
+                            PBSession.getUserInstance(getContext()).setRecord(jsonResponse.getJSONObject("record"));
 
-                    Dialog.exitLoading();
+                            Dialog.exitLoading();
 
-                    // Redirect to MainActivity (or wherever you want to go post-login)
-                    navigateToMainActivity();
+                            // Navigate to MainActivity
+                            navigateToMainActivity();
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    // Handle any issues with the response parsing
-                    showError("Failed to parse the login response.");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            // Handle JSON parsing errors
+                            showError("Failed to parse the login response.");
+                        }
+                    });
                 }
             }
 
+
             @Override
             public void onError(String errorMessage) {
-                // Handle the error, maybe show a Toast or update the UI
-                showError(errorMessage);
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        showError(errorMessage);
+                    });
+                }
             }
         });
     }
@@ -154,8 +159,8 @@ public class LoginFragment extends Fragment {
 
     private void navigateToMainActivity() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
+        Router.clear();
         startActivity(intent);
-        getActivity().finish(); // Optional: To close LoginActivity if necessary
     }
 
 }

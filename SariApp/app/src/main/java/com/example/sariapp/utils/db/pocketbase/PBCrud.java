@@ -1,5 +1,7 @@
 package com.example.sariapp.utils.db.pocketbase;
 
+import android.content.Context;
+
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBListCallback;
@@ -15,16 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PBCrud<T> {
-
+    private final Context context;
+    private final PBSession session;
+    private final String authToken;
     private final PBAuth auth = PBAuth.getInstance();
     private final PBConn conn = PBConn.getInstance();
-    private final PBSession session = PBSession.getInstance();
     private final String baseUrl = auth.getBaseUrl();
-    private final String authToken = session.getToken();
     private final Class<T> modelClass;
     private final String collectionName;
 
-    public PBCrud(Class<T> modelClass, String collectionName) {
+    public PBCrud(Context context, PBSession session, Class<T> modelClass, String collectionName) {
+        this.context = context;
+        this.session =  session;
+        this.authToken = session.getToken();
         this.modelClass = modelClass;
         this.collectionName = collectionName;
     }
@@ -53,7 +58,7 @@ public class PBCrud<T> {
         }
     }
 
-    public void listAsList(String fieldName, String value, PBListCallback<T> callback) {
+    public void collectionAsList(String fieldName, String value, PBListCallback<T> callback) {
         list(fieldName, value, new PBCallback() {
             @Override
             public void onSuccess(String result) {

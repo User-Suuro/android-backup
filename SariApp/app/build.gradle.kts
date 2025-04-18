@@ -37,7 +37,9 @@ android {
             res {
                 srcDirs (
                         "src\\main\\res",
+                        "src\\main\\assets",
                         "src\\main\\res\\layouts",
+
                         "src\\main\\res\\layouts\\auth",
 
                         "src\\main\\res\\layouts\\home",
@@ -50,6 +52,7 @@ android {
                         "src\\main\\res\\layouts\\components",
                         "src\\main\\res\\layouts\\components\\dialog",
                         "src\\main\\res\\layouts\\components\\item",
+
                         "src\\main\\res\\drawables",
                         "src\\main\\res\\drawables\\icons",
                 )
@@ -84,4 +87,7 @@ dependencies {
     
     // Barcode
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
+    //env
+    implementation("io.github.cdimascio:dotenv-java:3.2.0")
 }

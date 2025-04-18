@@ -5,9 +5,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class Router {
-    private static volatile Router instance;
+    private static Router instance;
     private FragmentManager fragmentManager;
-    private Integer containerId = null; // Nullable
+    private Integer containerId;
 
     private Router(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
@@ -15,24 +15,14 @@ public class Router {
 
     public static Router getInstance(FragmentManager fragmentManager) {
         if (instance == null) {
-            synchronized (Router.class) {
-                if (instance == null) {
-                    instance = new Router(fragmentManager);
-                }
-            }
+            instance = new Router(fragmentManager);
+        } else {
+            instance.fragmentManager = fragmentManager; // Update only this, keep containerId
         }
         return instance;
     }
 
-    // Optionally set the container ID
-    public Router setContainerId(int containerId) {
-        this.containerId = containerId;
-        return this;
-    }
-
-    public void switchFragment(Fragment newFragment, boolean addToBackStack) {
-        if (containerId == null) throw new IllegalStateException("Container ID not set.");
-
+    public void switchFragment(Fragment newFragment, boolean addToBackStack, int containerId) {
         String tag = newFragment.getClass().getSimpleName();
         FragmentTransaction transaction = fragmentManager.beginTransaction()
                 .replace(containerId, newFragment, tag);

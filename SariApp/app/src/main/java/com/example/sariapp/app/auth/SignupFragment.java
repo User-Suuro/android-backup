@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.sariapp.R;
+import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.ui.Router;
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
 import com.example.sariapp.utils.db.pocketbase.PBCrud;
@@ -44,7 +45,7 @@ public class SignupFragment extends Fragment {
     private final PBAuth auth = PBAuth.getInstance();;
     EditText emailInput, passInput, confirmInput;
     TextInputLayout emailInputLayout, passInputLayout, confirmInputLayout;
-    PBCrud<Users> crud = new PBCrud<>(Users.class, PBCollection.USERS.getName());
+    PBCrud<Users> crud = new PBCrud<>(getContext(), PBSession.getAdminInstance(getContext()), Users.class, PBCollection.USERS.getName());
 
     public SignupFragment() {
         // Required empty public constructor
@@ -105,7 +106,7 @@ public class SignupFragment extends Fragment {
         goRegisterText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Router.getInstance(getFragmentManager()).switchFragment(new LoginFragment(), false);
+                Router.getInstance(getFragmentManager()).switchFragment(new LoginFragment(),  false, R.id.auth_container);
             }
         });
 
@@ -189,7 +190,7 @@ public class SignupFragment extends Fragment {
 
                             // Navigate to success fragment
                             Router.getInstance(getParentFragmentManager())
-                                    .switchFragment(VerifyFragment.newInstance(users.getEmail(), userID), false);
+                                    .switchFragment(VerifyFragment.newInstance(users.getEmail(), userID), false, R.id.auth_container);
 
                         } catch (JSONException e) {
                             throw new RuntimeException(e);

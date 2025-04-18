@@ -1,21 +1,13 @@
 package com.example.sariapp.utils.db.pocketbase;
+
+import com.example.sariapp.utils.EnvConfig;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 public class PBAuth {
-
-    private static final String base_url = "https://suuro.pockethost.io";
+    private static final String base_url = EnvConfig.PB_BASE_URL;
     private static PBAuth instance; // Singleton instance
     private final PBConn api = PBConn.getInstance();
 
@@ -108,6 +100,16 @@ public class PBAuth {
         }
 
         api.sendPostRequest(url, json, null, callback);
+    }
+
+    public void refreshAdminToken(String currentToken, PBCallback callback) {
+        String url = base_url + "/api/collections/_superusers/auth-refresh";
+        api.sendPostRequest(url,  new JSONObject(), currentToken, callback);
+    }
+
+    public void refreshUserToken(String currentToken, PBCallback callback) {
+        String url = base_url + "/api/collections/users/auth-refresh";
+        api.sendPostRequest(url, new JSONObject(), currentToken, callback);
     }
 
     public String getBaseUrl() {

@@ -9,7 +9,7 @@ import android.widget.Toast;
 import com.example.sariapp.R;
 import com.example.sariapp.app.auth.FailedFragment;
 import com.example.sariapp.app.auth.LoginFragment;
-import com.example.sariapp.app.auth.SignupFragment;
+import com.example.sariapp.utils.EnvConfig;
 import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.ui.Router;
 
@@ -21,9 +21,12 @@ import org.json.JSONObject;
 
 public class AuthActivity extends AppCompatActivity {
 
-    Router router;
-    PBAuth pb;
-    PBSession session;
+    private Router router;
+    private PBAuth auth;
+    private PBSession userSession;
+    private PBSession adminSession;
+    private final String admin = EnvConfig.PB_ADMIN_EMAIL;
+    private final String password = EnvConfig.PB_ADMIN_PASSWORD;
 
     // -- Start
     @Override
@@ -32,19 +35,58 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
         getSupportActionBar().hide();
 
-        // temporarily use admin token for users registration
-        String admin = "godwingalvez26@gmail.com";
-        String password = "anatadare123";
+        auth = PBAuth.getInstance();
+        adminSession = PBSession.getAdminInstance(getApplicationContext());
+        router = Router.getInstance(getSupportFragmentManager());
 
-        pb = PBAuth.getInstance();
-        session = PBSession.getInstance();
-
-        if (!session.isLoggedIn()) {
-            authAdmin(pb, admin, password);
+        // Only refresh if logged in
+        if (adminSession.isLoggedIn()) {
+            refreshSession(adminSession.getToken());
+        } else {
+            authAdmin(auth, admin, password);
         }
 
-        router = Router.getInstance(getSupportFragmentManager());
-        router.setContainerId(R.id.auth_container);
+        router.switchFragment(new LoginFragment(), false, R.id.auth_container);
+    }
+
+    private void refreshSession(String currentToken) {
+        Dialog.showLoading(this);
+
+        new Thread(() -> {
+            auth.refreshAdminToken(currentToken, new PBCallback() {
+                @Override
+                public void onSuccess(String responseBody) {
+                    runOnUiThread(() -> {
+                        Dialog.exitLoading();
+                        try {
+                            JSONObject json = new JSONObject(responseBody);
+                            String newToken = json.getString("token");
+                            JSONObject record = json.getJSONObject("record");
+
+                            // Save updated token and record
+                            adminSession.setToken(newToken);
+                            adminSession.setRecord(record);
+
+                            Toast.makeText(getApplicationContext(), "Session refreshed", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), "Failed to parse refresh response", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        Dialog.exitLoading();
+                        Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                        adminSession.clear();
+
+                        // if failed to refresh authenticate then
+                        authAdmin(auth, admin, password);
+                    });
+                }
+            });
+        }).start();
     }
 
     private void authAdmin(PBAuth pb, String email, String password) {
@@ -60,21 +102,21 @@ public class AuthActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonResponse = new JSONObject(result);
                             String authToken = jsonResponse.getString("token");
+                            JSONObject record = jsonResponse.getJSONObject("record");
 
-                            // establish session credentials
+                            // Get session with context
+                            PBSession session = PBSession.getAdminInstance(getApplicationContext());
+
+                            // Store token and user record persistently
                             session.setToken(authToken);
-                            session.setRecord(jsonResponse.getJSONObject("record"));
+                            session.setRecord(record);
 
-                            Toast.makeText(AuthActivity.this, "Connection Established" , Toast.LENGTH_LONG).show();
-
-                            // Switch to signup fragment
+                            Toast.makeText(AuthActivity.this, "Connection Established", Toast.LENGTH_LONG).show();
 
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Dialog.showError(AuthActivity.this, e.getMessage().toString(), () -> {});
+                            Dialog.showError(AuthActivity.this, "Parse error: " + e.getMessage(), () -> {});
                         }
-
-                        router.switchFragment(new LoginFragment(), false);
                     });
                 }
 
@@ -82,13 +124,11 @@ public class AuthActivity extends AppCompatActivity {
                 public void onError(String error) {
                     runOnUiThread(() -> {
                         Dialog.exitLoading();  // Hide loading
-
-                        // Show error dialog with callback
                         Dialog.showError(AuthActivity.this, "Error: " + error, () -> {
-                            finish();  // Exit app or activity on close
+                            finish();  // Optional: Exit activity
                         });
 
-                        router.switchFragment(new FailedFragment(), false);
+                        router.switchFragment(new FailedFragment(), false, R.id.auth_container);
                     });
                 }
             });

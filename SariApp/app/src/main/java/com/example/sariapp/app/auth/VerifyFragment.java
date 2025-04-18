@@ -151,7 +151,7 @@ public class VerifyFragment extends Fragment {
                             Dialog.exitLoading();
                             Toast.makeText(getContext(), "OTP Verified!", Toast.LENGTH_SHORT).show();
                             Router.getInstance(getParentFragmentManager())
-                                    .switchFragment(new SuccessFragment(), false);
+                                    .switchFragment(new SuccessFragment(), false, R.id.auth_container);
 
                         });
                     } catch (IllegalStateException e) {
