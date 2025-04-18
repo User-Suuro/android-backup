@@ -17,7 +17,6 @@ public class PBAuth {
 
     private static final String base_url = "https://suuro.pockethost.io";
     private static PBAuth instance; // Singleton instance
-    private String token;
     private final PBConn api = PBConn.getInstance();
 
     private PBAuth() {
@@ -109,21 +108,6 @@ public class PBAuth {
         }
 
         api.sendPostRequest(url, json, null, callback);
-    }
-
-    // Set token when user is authenticated
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    // Get token when needed
-    public String getToken() {
-        return token;
-    }
-
-    // Check if logged in
-    public boolean isLoggedIn() {
-        return token != null && !token.isEmpty();
     }
 
     public String getBaseUrl() {

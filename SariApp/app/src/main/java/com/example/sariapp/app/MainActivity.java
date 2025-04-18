@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             String current = Router.getInstance(getSupportFragmentManager()).currFragmentName();
 
             if(item.getItemId() == R.id.nav_home) {
-
+                // home
                 if (!current.equals(HomeFragment.class.getSimpleName())) {
                     Router.getInstance(getSupportFragmentManager())
                             .switchFragment(new HomeFragment(), false);
@@ -36,18 +36,18 @@ public class MainActivity extends AppCompatActivity {
 
                return true;
             } else if (item.getItemId() == R.id.nav_discover) {
-
+                // discover
                 if (!current.equals(DiscoverFragment.class.getSimpleName())) {
                     Router.getInstance(getSupportFragmentManager())
-                            .switchFragment(new HomeFragment(), false);
+                            .switchFragment(new DiscoverFragment(), false);
                 }
 
                 return true;
             } else if (item.getItemId() == R.id.nav_profile) {
-
+                // more
                 if (!current.equals(MoreFragment.class.getSimpleName())) {
                     Router.getInstance(getSupportFragmentManager())
-                            .switchFragment(new HomeFragment(), false);
+                            .switchFragment(new MoreFragment(), false);
                 }
 
                 return true;

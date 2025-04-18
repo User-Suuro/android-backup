@@ -3,7 +3,8 @@ package com.example.sariapp.models;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 
 public class Users {
-
+    @PBField("id")
+    private String id;
     @PBField("username")
     private String username;
     @PBField("email")
@@ -30,6 +31,7 @@ public class Users {
     public String getEmail() {
         return email;
     }
+    public String getID() {return id;}
 
 
     // Static Builder class

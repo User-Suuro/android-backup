@@ -8,7 +8,9 @@ import android.widget.Toast;
 
 import com.example.sariapp.R;
 import com.example.sariapp.app.auth.FailedFragment;
+import com.example.sariapp.app.auth.LoginFragment;
 import com.example.sariapp.app.auth.SignupFragment;
+import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.ui.Router;
 
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
@@ -21,6 +23,7 @@ public class AuthActivity extends AppCompatActivity {
 
     Router router;
     PBAuth pb;
+    PBSession session;
 
     // -- Start
     @Override
@@ -34,8 +37,9 @@ public class AuthActivity extends AppCompatActivity {
         String password = "anatadare123";
 
         pb = PBAuth.getInstance();
+        session = PBSession.getInstance();
 
-        if (!pb.isLoggedIn()) {
+        if (!session.isLoggedIn()) {
             authAdmin(pb, admin, password);
         }
 
@@ -57,8 +61,11 @@ public class AuthActivity extends AppCompatActivity {
                             JSONObject jsonResponse = new JSONObject(result);
                             String authToken = jsonResponse.getString("token");
 
-                            pb.setToken(authToken);
-                            Toast.makeText(AuthActivity.this, "Connection Established: " + pb.getToken() , Toast.LENGTH_LONG).show();
+                            // establish session credentials
+                            session.setToken(authToken);
+                            session.setRecord(jsonResponse.getJSONObject("record"));
+
+                            Toast.makeText(AuthActivity.this, "Connection Established" , Toast.LENGTH_LONG).show();
 
                             // Switch to signup fragment
 
@@ -67,7 +74,7 @@ public class AuthActivity extends AppCompatActivity {
                             Dialog.showError(AuthActivity.this, e.getMessage().toString(), () -> {});
                         }
 
-                        router.switchFragment(new SignupFragment(), false);
+                        router.switchFragment(new LoginFragment(), false);
                     });
                 }
 

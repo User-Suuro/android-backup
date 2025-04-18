@@ -10,13 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sariapp.R;
 import com.example.sariapp.app.MainActivity;
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
+import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.ui.Dialog;
+import com.example.sariapp.utils.ui.Router;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -94,6 +97,16 @@ public class LoginFragment extends Fragment {
             }
         });
 
+
+        TextView goLoginText = view.findViewById(R.id.clickableRegisterLabel);
+        goLoginText.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Router.getInstance(getFragmentManager()).switchFragment(new SignupFragment(), false);
+            }
+        });
+
         return view;
     }
 
@@ -107,11 +120,13 @@ public class LoginFragment extends Fragment {
             public void onSuccess(String result) {
                 try {
                     // Get the token from the response (assuming it's in the response)
-                    JSONObject jsonObject = new JSONObject(result);
-                    String token = jsonObject.optString("token");
+                    JSONObject jsonResponse = new JSONObject(result);
+                    String token = jsonResponse.optString("token");
 
                     // Save the token to PBAuth singleton
-                    auth.setToken(token);
+                    PBSession.getInstance().setToken(token);
+                    PBSession.getInstance().setRecord(jsonResponse.getJSONObject("record"));
+
                     Dialog.exitLoading();
 
                     // Redirect to MainActivity (or wherever you want to go post-login)
@@ -138,8 +153,6 @@ public class LoginFragment extends Fragment {
     }
 
     private void navigateToMainActivity() {
-        // Navigate to MainActivity after successful login
-        // You can replace this with your fragment transaction or activity transition
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
         getActivity().finish(); // Optional: To close LoginActivity if necessary

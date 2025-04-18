@@ -1,9 +1,10 @@
 package com.example.sariapp.utils.db.pocketbase.PBTypes;
 
 public enum PBCollection {
-    PRODUCTS(""),
+    PRODUCTS("products"),
     USERS("users"),
-    STORES("stores");
+    STORES("stores"),
+    STAFFS("staffs");
 
     private final String name;
 

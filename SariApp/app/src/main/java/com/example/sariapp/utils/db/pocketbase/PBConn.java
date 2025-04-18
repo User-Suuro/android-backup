@@ -19,6 +19,7 @@ public class PBConn {
     private static final OkHttpClient client = new OkHttpClient();
     private static PBConn instance;
 
+
     public static PBConn getInstance() {
         if (instance == null) {
             instance = new PBConn();
@@ -98,6 +99,8 @@ public class PBConn {
 
         executeRequest(builder.build(), callback);
     }
+
+
 
     public OkHttpClient getClient() {
         return client;

@@ -20,6 +20,11 @@
     <string name="your_account_has_been_successfully_verified">Your account has been successfully verified</string>
     <string name="go_back_to_login">Go back to login</string>
 
+    <!-- Login Fragment -->
+    <string name="new_here_register">New here?</string>
+    <string name="register_link"><u>Register</u></string>
+    <string name="link_login"><u>Login</u></string>
+
     <!-- TODO: Remove or change this placeholder text -->
 
 </resources>

@@ -69,14 +69,28 @@
             app:cornerRadius="@dimen/radius_small"
             />
 
-        <TextView
-            android:id="@+id/clickableRegisterLabel"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Register Here"
-            android:layout_gravity="end"
-            android:contextClickable="true"
-        />
+            android:layout_gravity="end">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/new_here_register"
+                />
+
+            <TextView
+                android:id="@+id/clickableRegisterLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_tiny"
+                android:text="@string/register_link"
+                android:contextClickable="true"
+                />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

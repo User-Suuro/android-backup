@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.sariapp.R;
 import com.example.sariapp.utils.ui.Router;
@@ -97,6 +98,14 @@ public class SignupFragment extends Fragment {
 
                 Dialog.showLoading(getContext());
                 checkAndHandleExistingUser(email, password, confirm);
+            }
+        });
+
+        TextView goRegisterText = view.findViewById(R.id.clickableLoginLabel);
+        goRegisterText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Router.getInstance(getFragmentManager()).switchFragment(new LoginFragment(), false);
             }
         });
 
