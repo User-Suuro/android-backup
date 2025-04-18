@@ -1,4 +1,4 @@
-package com.example.sariapp.app.home.join_create;
+package com.example.sariapp.app.home.staffs;
 
 import android.os.Bundle;
 
@@ -61,6 +61,6 @@ public class JoinFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_join, container, false);
+        return inflater.inflate(R.layout.fragment_join_store, container, false);
     }
 }

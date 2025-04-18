@@ -1,4 +1,4 @@
-package com.example.sariapp.app.home.join_create;
+package com.example.sariapp.app.home.stores;
 
 import android.os.Bundle;
 

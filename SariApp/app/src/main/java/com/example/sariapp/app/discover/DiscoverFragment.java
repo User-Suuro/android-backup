@@ -31,7 +31,6 @@ public class DiscoverFragment extends Fragment {
     public static DiscoverFragment newInstance() {
         DiscoverFragment fragment = new DiscoverFragment();
         Bundle args = new Bundle();
-
         fragment.setArguments(args);
         return fragment;
     }

@@ -45,7 +45,7 @@ public class SignupFragment extends Fragment {
     private final PBAuth auth = PBAuth.getInstance();;
     EditText emailInput, passInput, confirmInput;
     TextInputLayout emailInputLayout, passInputLayout, confirmInputLayout;
-    PBCrud<Users> crud = new PBCrud<>(getContext(), PBSession.getAdminInstance(getContext()), Users.class, PBCollection.USERS.getName());
+    PBCrud<Users> crud = new PBCrud<>(Users.class, PBCollection.USERS.getName(), PBSession.getAdminInstance(getContext()).getToken());
 
     public SignupFragment() {
         // Required empty public constructor

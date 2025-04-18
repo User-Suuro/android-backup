@@ -1,18 +1,20 @@
 package com.example.sariapp.app;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.example.sariapp.R;
 import com.example.sariapp.app.discover.DiscoverFragment;
 import com.example.sariapp.app.home.HomeFragment;
 import com.example.sariapp.app.more.MoreFragment;
+import com.example.sariapp.models.Staffs;
 import com.example.sariapp.models.Stores;
-import com.example.sariapp.models.Users;
+
 import com.example.sariapp.utils.db.pocketbase.PBCrud;
 import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
+
 import com.example.sariapp.utils.ui.Router;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -24,8 +26,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Example usage of the PBCrud class
-        PBCrud<Stores> store_crud = new PBCrud<>(getApplicationContext(), PBSession.getUserInstance(getApplicationContext()), Stores.class, PBCollection.STORES.getName());
+        PBCrud<Stores> store_crud = new PBCrud<>(Stores.class, PBCollection.STORES.getName(), PBSession.getUserInstance(getApplicationContext()).getToken());
+
+
 
 
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".app.home.join_create.CreateStoreFragment">
+    tools:context=".app.home.stores.CreateStoreFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout

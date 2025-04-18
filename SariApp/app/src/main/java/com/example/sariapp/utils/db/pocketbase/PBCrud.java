@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PBCrud<T> {
-    private final Context context;
-    private final PBSession session;
+
     private final String authToken;
     private final PBAuth auth = PBAuth.getInstance();
     private final PBConn conn = PBConn.getInstance();
@@ -26,10 +25,8 @@ public class PBCrud<T> {
     private final Class<T> modelClass;
     private final String collectionName;
 
-    public PBCrud(Context context, PBSession session, Class<T> modelClass, String collectionName) {
-        this.context = context;
-        this.session =  session;
-        this.authToken = session.getToken();
+    public PBCrud(Class<T> modelClass, String collectionName, String token) {
+        this.authToken = token;
         this.modelClass = modelClass;
         this.collectionName = collectionName;
     }

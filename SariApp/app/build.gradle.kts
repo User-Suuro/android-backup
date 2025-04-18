@@ -44,7 +44,8 @@ android {
 
                         "src\\main\\res\\layouts\\home",
                         "src\\main\\res\\layouts\\home\\products",
-                        "src\\main\\res\\layouts\\home\\create_join",
+                        "src\\main\\res\\layouts\\home\\staffs",
+                        "src\\main\\res\\layouts\\home\\stores",
 
                         "src\\main\\res\\layouts\\more",
                         "src\\main\\res\\layouts\\discover",
