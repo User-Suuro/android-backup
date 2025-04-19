@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.home.staffs.JoinFragment">
+    tools:context=".app.home.staffs.JoinStoreFragment"
+    android:padding="@dimen/space_large"
+    >
 
     <!-- TODO: Update blank fragment layout -->
     <TextView

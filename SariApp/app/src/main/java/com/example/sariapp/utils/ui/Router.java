@@ -5,29 +5,23 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class Router {
-    private static Router instance;
-    private FragmentManager fragmentManager;
-    private Integer containerId;
+    private final FragmentManager fragmentManager;
+    private Integer containerId = null;
 
-    private Router(FragmentManager fragmentManager) {
+    public Router(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
     }
 
-    public static Router getInstance(FragmentManager fragmentManager) {
-        if (instance == null) {
-            instance = new Router(fragmentManager);
-        } else {
-            instance.fragmentManager = fragmentManager; // Update only this, keep containerId
-        }
-        return instance;
-    }
-
     public void switchFragment(Fragment newFragment, boolean addToBackStack, int containerId) {
+        this.containerId = containerId;
+
         String tag = newFragment.getClass().getSimpleName();
         FragmentTransaction transaction = fragmentManager.beginTransaction()
                 .replace(containerId, newFragment, tag);
 
-        if (addToBackStack) transaction.addToBackStack(tag);
+        if (addToBackStack) {
+            transaction.addToBackStack(tag);
+        }
 
         transaction.commit();
     }
@@ -39,8 +33,9 @@ public class Router {
             Fragment previousFragment = fragmentManager.findFragmentByTag(previousTag);
             fragmentManager.popBackStack();
 
-            if (previousFragment != null)
+            if (previousFragment != null) {
                 fragmentManager.beginTransaction().show(previousFragment).commit();
+            }
 
             return previousFragment;
         }
@@ -48,7 +43,10 @@ public class Router {
     }
 
     public String currFragmentName() {
-        if (containerId == null) return "Unknown";
+        if (containerId == null) {
+            return "Unknown";
+        }
+
         Fragment currentFragment = fragmentManager.findFragmentById(containerId);
         return (currentFragment != null) ? currentFragment.getClass().getSimpleName() : "None";
     }
@@ -60,13 +58,5 @@ public class Router {
             return (entry.getName() != null) ? entry.getName() : "Unnamed Fragment";
         }
         return "None";
-    }
-
-    public static void clear() {
-        if (instance != null) {
-            instance.fragmentManager = null;
-            instance.containerId = null;
-            instance = null;
-        }
     }
 }

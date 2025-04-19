@@ -100,7 +100,8 @@ public class LoginFragment extends Fragment {
         goLoginText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Router.getInstance(getFragmentManager()).switchFragment(new SignupFragment(), false, R.id.auth_container);
+                Router router = new Router(requireActivity().getSupportFragmentManager());
+                router.switchFragment(new SignupFragment(), false, R.id.auth_container);
             }
         });
 
@@ -129,7 +130,9 @@ public class LoginFragment extends Fragment {
                             Dialog.exitLoading();
 
                             // Navigate to MainActivity
-                            navigateToMainActivity();
+                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            startActivity(intent);
+                            requireActivity().finish();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -157,10 +160,6 @@ public class LoginFragment extends Fragment {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    private void navigateToMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        Router.clear();
-        startActivity(intent);
-    }
+
 
 }

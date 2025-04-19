@@ -106,7 +106,8 @@ public class SignupFragment extends Fragment {
         goRegisterText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Router.getInstance(getFragmentManager()).switchFragment(new LoginFragment(),  false, R.id.auth_container);
+                Router router = new Router(requireActivity().getSupportFragmentManager());
+                router.switchFragment(new LoginFragment(),  false, R.id.auth_container);
             }
         });
 
@@ -189,8 +190,8 @@ public class SignupFragment extends Fragment {
                             String userID = jsonResponse.optString("id", null);
 
                             // Navigate to success fragment
-                            Router.getInstance(getParentFragmentManager())
-                                    .switchFragment(VerifyFragment.newInstance(users.getEmail(), userID), false, R.id.auth_container);
+                            Router router = new Router(requireActivity().getSupportFragmentManager());
+                                    router.switchFragment(VerifyFragment.newInstance(users.getEmail(), userID), false, R.id.auth_container);
 
                         } catch (JSONException e) {
                             throw new RuntimeException(e);

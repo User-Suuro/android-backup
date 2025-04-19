@@ -70,9 +70,8 @@ public class SuccessFragment extends Fragment {
         btnGoBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FrameLayout container = ((AuthActivity) requireActivity()).getAuthContainer();
-                Router.getInstance(getParentFragmentManager())
-                        .switchFragment(new LoginFragment(), false, R.id.auth_container);
+                Router router = new Router(requireActivity().getSupportFragmentManager());
+                router.switchFragment(new LoginFragment(), false, R.id.auth_container);
             }
         });
 

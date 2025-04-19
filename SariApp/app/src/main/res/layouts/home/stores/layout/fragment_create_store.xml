@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".app.home.stores.CreateStoreFragment">
+    tools:context=".app.home.stores.CreateStoreFragment"
+    android:padding="@dimen/space_large"
+    >
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
@@ -28,9 +30,10 @@
             android:id="@+id/inputStoreName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:startIconDrawable="@drawable/ic_store_outline"
             android:layout_marginBottom="@dimen/space_small"
             android:hint="Store Name"
+            app:startIconDrawable="@drawable/ic_store_outline"
+            app:endIconMode="clear_text"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -45,9 +48,10 @@
             android:id="@+id/inputStoreDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:startIconDrawable="@drawable/ic_information_outline"
             android:layout_marginBottom="@dimen/space_small"
             android:hint="Description"
+            app:startIconDrawable="@drawable/ic_information_outline"
+            app:endIconMode="clear_text"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -67,6 +71,7 @@
             android:focusable="false"
             android:inputType="none"
             app:startIconDrawable="@drawable/ic_calendar_range"
+            app:endIconMode="clear_text"
            >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -75,7 +80,7 @@
             android:layout_height="wrap_content"
             android:inputType="none"
             android:focusable="false"
-            android:hint="MM/DD/YYYY" />
+         />
     </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Store Address -->
@@ -84,9 +89,10 @@
             android:id="@+id/inputStoreAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:startIconDrawable="@drawable/ic_location"
             android:layout_marginBottom="@dimen/space_small"
             android:hint="Store Address"
+            app:startIconDrawable="@drawable/ic_location"
+            app:endIconMode="clear_text"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -94,8 +100,6 @@
                 android:layout_height="wrap_content"
                 />
         </com.google.android.material.textfield.TextInputLayout>
-
-
 
 
         <com.google.android.material.button.MaterialButton

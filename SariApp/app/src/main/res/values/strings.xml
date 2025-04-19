@@ -25,6 +25,19 @@
     <string name="register_link"><u>Register</u></string>
     <string name="link_login"><u>Login</u></string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+    <!-- Route Names -->
+    <string name="join_as_staff">Join As Staff</string>
+    <string name="join_store">Join Store</string>
+    <string name="home">Home</string>
+    <string name="stores">Stores</string>
+    <string name="organization">Organization</string>
+    <string name="discover">Discover</string>
+    <string name="more">More</string>
+
+    <!-- Home -->
+    <string name="there_are_no_stores_available">There are no stores available</string>
+    <string name="click_here_to_create_a_store">Click here to create a store</string>
+    <string name="no_organization_found">No Organization found</string>
+    <string name="click_here_to_join_to_another_store">Click here to join to another store</string>
 
 </resources>
