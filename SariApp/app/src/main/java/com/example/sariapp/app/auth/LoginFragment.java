@@ -20,6 +20,7 @@ import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.ui.Dialog;
 import com.example.sariapp.utils.ui.Router;
+import com.example.sariapp.models.Users;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -32,15 +33,6 @@ import org.json.JSONObject;
  */
 public class LoginFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     EditText emailInput, passInput;
     TextInputLayout emailLayout, passLayout;
 
@@ -48,20 +40,9 @@ public class LoginFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LoginFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LoginFragment newInstance(String param1, String param2) {
+    public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,10 +50,6 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -122,10 +99,18 @@ public class LoginFragment extends Fragment {
                             // Parse the JSON response
                             JSONObject jsonResponse = new JSONObject(result);
                             String token = jsonResponse.optString("token");
+                            JSONObject record = jsonResponse.getJSONObject("record");
 
-                            // Save the token and record to PBSession singleton
-                            PBSession.getUserInstance(getContext()).setToken(token);
-                            PBSession.getUserInstance(getContext()).setRecord(jsonResponse.getJSONObject("record"));
+                            // Build the Users model using the Builder pattern
+                            Users user = new Users.Builder()
+                                    .id(record.optString("id"))
+                                    .username(jsonResponse.optString("username"))
+                                    .email(jsonResponse.optString("email"))
+                                    .token(token)
+                                    .build();
+
+                            // Save the token and the Users object to PBSession singleton
+                            PBSession.getUserInstance(getContext()).setUser(user);  // Save Users object
 
                             Dialog.exitLoading();
 
@@ -143,7 +128,6 @@ public class LoginFragment extends Fragment {
                 }
             }
 
-
             @Override
             public void onError(String errorMessage) {
                 if (isAdded()) {
@@ -159,7 +143,4 @@ public class LoginFragment extends Fragment {
         // Display an error message, for example, using a Toast
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
-
-
-
 }

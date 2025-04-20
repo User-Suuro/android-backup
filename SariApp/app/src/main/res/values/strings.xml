@@ -43,5 +43,6 @@
     <string name="password_mismatch">Password does not match</string>
     <string name="select_date_of_establishment">Select Date of Establishment</string>
     <string name="mm_dd_yyyy">MM/dd/yyyy</string>
+    <string name="create_store">Create Store</string>
 
 </resources>

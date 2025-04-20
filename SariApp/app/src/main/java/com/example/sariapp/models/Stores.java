@@ -1,7 +1,6 @@
 package com.example.sariapp.models;
 
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
-import com.example.sariapp.utils.db.pocketbase.PBTypes.PBRelation;
 
 public class Stores {
 
@@ -11,16 +10,16 @@ public class Stores {
     @PBField("name")
     private String name;
 
-    // One-to-one relation to Users
     @PBField("owner")
-    @PBRelation(relatedType = Users.class)
-    private Users owner;
+    private String owner;
 
     @PBField("description")
     private String description;
 
     @PBField("address")
     private String address;
+    @PBField("establishment")
+    private String establishmentDate;
 
     @PBField("location_x")
     private double locationX;
@@ -42,24 +41,30 @@ public class Stores {
 
     // Builder pattern
     public static class Builder {
-
+        private String id;
         private String name;
-        private Users owner;
+        private String owner;
         private String description;
         private String address;
+        private String establishmentDate;
         private double locationX;
         private double locationY;
         private double locationZ;
         private String zipcode;
         private String created;
 
+        public Builder setId(String id) {
+            this.id = id;
+            return this;
+        }
+
         public Builder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder setOwner(Users owner) {
-            this.owner = owner;
+        public Builder setOwner(String ownerID) {
+            this.owner = ownerID;
             return this;
         }
 
@@ -70,6 +75,11 @@ public class Stores {
 
         public Builder setAddress(String address) {
             this.address = address;
+            return this;
+        }
+
+        public Builder setEstablishmentDate(String establishmentDate){
+            this.establishmentDate = establishmentDate;
             return this;
         }
 
@@ -100,6 +110,7 @@ public class Stores {
 
         public Stores build() {
             Stores store = new Stores();
+            store.id = this.id;
             store.name = this.name;
             store.owner = this.owner;
             store.description = this.description;
@@ -109,6 +120,7 @@ public class Stores {
             store.locationZ = this.locationZ;
             store.zipcode = this.zipcode;
             store.created = this.created;
+            store.establishmentDate = this.establishmentDate;
             return store;
         }
     }
@@ -122,7 +134,11 @@ public class Stores {
         return name;
     }
 
-    public Users getOwner() {
+    public String getEstablishmentDate() {
+        return establishmentDate;
+    }
+
+    public String getOwner() {
         return owner;
     }
 

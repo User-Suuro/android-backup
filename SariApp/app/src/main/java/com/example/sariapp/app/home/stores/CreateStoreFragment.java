@@ -7,7 +7,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,57 +23,31 @@ import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
 import com.example.sariapp.utils.ui.Dialog;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CreateStoreFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CreateStoreFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
-
-    // TODO: Rename and change types of parameters
-
 
     public CreateStoreFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-
-     * @return A new instance of fragment CreateStoreFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static CreateStoreFragment newInstance() {
-        CreateStoreFragment fragment = new CreateStoreFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+        return new CreateStoreFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {}
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_create_store, container, false);
 
         TextInputLayout layoutStoreName = view.findViewById(R.id.inputStoreName);
@@ -87,6 +60,11 @@ public class CreateStoreFragment extends Fragment {
         EditText etStoreDescription = layoutStoreDescription.getEditText();
         EditText etStoreAddress = layoutStoreAddress.getEditText();
         EditText etDoE = layoutDoE.getEditText();
+
+        if (etStoreName == null || etStoreDescription == null || etStoreAddress == null || etDoE == null) {
+            Toast.makeText(getContext(), "Error loading input fields", Toast.LENGTH_SHORT).show();
+            return view;
+        }
 
         etDoE.setOnClickListener(v -> {
             MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
@@ -103,105 +81,108 @@ public class CreateStoreFragment extends Fragment {
             });
         });
 
-        btnCreateStore.setOnClickListener(v-> {
-            String storeName = etStoreName.getText().toString();
-            String storeDescription = etStoreDescription.getText().toString();
-            String storeAddress = etStoreAddress.getText().toString();
-            String dateOfEstablishment = etDoE.getText().toString();
+        btnCreateStore.setOnClickListener(v -> {
+            // Clear previous errors
+            layoutStoreName.setError(null);
+            layoutStoreDescription.setError(null);
+            layoutStoreAddress.setError(null);
+            layoutDoE.setError(null);
 
-            // Checkers
+            String storeName = etStoreName.getText().toString().trim();
+            String storeDescription = etStoreDescription.getText().toString().trim();
+            String storeAddress = etStoreAddress.getText().toString().trim();
+            String dateOfEstablishment = etDoE.getText().toString().trim();
+
+            boolean hasError = false;
 
             if (storeName.isEmpty()) {
                 layoutStoreName.setError(getString(R.string.required_field));
-                return;
+                hasError = true;
             }
 
             if (storeDescription.isEmpty()) {
                 layoutStoreDescription.setError(getString(R.string.required_field));
-                return;
+                hasError = true;
             }
 
             if (storeAddress.isEmpty()) {
                 layoutStoreAddress.setError(getString(R.string.required_field));
-                return;
+                hasError = true;
             }
 
             if (dateOfEstablishment.isEmpty()) {
                 layoutDoE.setError(getString(R.string.required_field));
-                return;
+                hasError = true;
             }
 
+            if (hasError) return;
+
             PBCrud<Stores> stores_crud = new PBCrud<>(Stores.class, PBCollection.STORES.getName(), PBSession.getUserInstance(getContext()).getToken());
+
             Stores store = new Stores.Builder()
-                    .name(storeName)
-                    .owner(PBSession.getUserInstance(getContext()).getUserId())
-                    .description(storeDescription)
-                    .address(storeAddress)
-                    .establishment(dateOfEstablishment)
+                    .setName(storeName)
+                    .setOwner(PBSession.getUserInstance(getContext()).getUser().getID())
+                    .setDescription(storeDescription)
+                    .setAddress(storeAddress)
+                    .setEstablishmentDate(dateOfEstablishment)
                     .build();
+
+            Toast.makeText(getContext(), String.valueOf(PBSession.getUserInstance(getContext()).getUser().getID()), Toast.LENGTH_SHORT).show();
 
             Dialog.showLoading(getContext());
 
             stores_crud.create(store, new PBCallback() {
                 @Override
                 public void onSuccess(String result) {
-                    // success
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() -> {
                             Dialog.exitLoading();
-                            Toast.makeText(getContext(), "Store Successfully Added", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Store successfully added", Toast.LENGTH_SHORT).show();
+                            requireActivity().getSupportFragmentManager().popBackStack(); // Navigate back
                         });
                     }
                 }
 
                 @Override
                 public void onError(String error) {
-                    // error
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() -> {
                             Dialog.exitLoading();
                             Dialog.showError(getContext(), error, null);
                         });
                     }
-
                 }
             });
         });
 
-
         return view;
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Show back button in action bar
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true); // Show back button
-            actionBar.setTitle(getString(R.string.join_store)); // Optional: set title
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(getString(R.string.create_store));
         }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        // Restore the default action bar when this fragment is gone
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false); // Hide back button
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            requireActivity().onBackPressed(); // Handle back press
+            requireActivity().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

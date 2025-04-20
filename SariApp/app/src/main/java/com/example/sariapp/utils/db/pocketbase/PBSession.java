@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.example.sariapp.models.Users;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,24 +17,19 @@ public class PBSession {
 
     private static final String PREF_NAME_USER = "PBSessionPrefs_User";
     private static final String PREF_NAME_ADMIN = "PBSessionPrefs_Admin";
-    private static final String KEY_TOKEN = "auth_token";
     private static final String KEY_RECORD = "auth_record";
 
     private static PBSession userInstance;
     private static PBSession adminInstance;
 
     private final SharedPreferences prefs;
-    private String token;
-    private JSONObject record;
+    private Users user;
 
     private PBSession(Context context, String prefName) {
         prefs = context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
         loadSession();
     }
 
-    /**
-     * Retrieves the singleton instance for the user role.
-     */
     public static PBSession getUserInstance(Context context) {
         if (userInstance == null) {
             userInstance = new PBSession(context.getApplicationContext(), PREF_NAME_USER);
@@ -40,9 +37,6 @@ public class PBSession {
         return userInstance;
     }
 
-    /**
-     * Retrieves the singleton instance for the admin role.
-     */
     public static PBSession getAdminInstance(Context context) {
         if (adminInstance == null) {
             adminInstance = new PBSession(context.getApplicationContext(), PREF_NAME_ADMIN);
@@ -51,11 +45,16 @@ public class PBSession {
     }
 
     private void loadSession() {
-        token = prefs.getString(KEY_TOKEN, null);
         String recordStr = prefs.getString(KEY_RECORD, null);
         if (recordStr != null) {
             try {
-                record = new JSONObject(recordStr);
+                JSONObject record = new JSONObject(recordStr);
+                user = new Users.Builder()
+                        .id(record.optString("id"))
+                        .username(record.optString("username"))
+                        .email(record.optString("email"))
+                        .token(record.optString("token"))
+                        .build();
             } catch (JSONException e) {
                 Log.e("PBSession", "Failed to parse saved record JSON", e);
             }
@@ -64,61 +63,42 @@ public class PBSession {
 
     private void saveSession() {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(KEY_TOKEN, token);
-        editor.putString(KEY_RECORD, record != null ? record.toString() : null);
+        if (user != null) {
+            try {
+                JSONObject recordJson = new JSONObject();
+                recordJson.put("id", user.getID());
+                recordJson.put("username", user.getUsername());
+                recordJson.put("email", user.getEmail());
+                recordJson.put("token", user.getToken());
+                editor.putString(KEY_RECORD, recordJson.toString());
+            } catch (JSONException e) {
+                Log.e("PBSession", "Failed to convert Users model to JSON", e);
+            }
+        } else {
+            editor.remove(KEY_RECORD);
+        }
         editor.apply();
     }
 
-    /**
-     * Sets the token for the current session.
-     */
-    public void setToken(String token) {
-        this.token = token;
-        saveSession();
-    }
-
-    /**
-     * Sets the token for the user session.
-     */
-    public static void setUserToken(Context context, String token) {
-        getUserInstance(context).setToken(token);
-    }
-
-    /**
-     * Sets the token for the admin session.
-     */
-    public static void setAdminToken(Context context, String token) {
-        getAdminInstance(context).setToken(token);
-    }
-
     public String getToken() {
-        return token;
+        return user != null ? user.getToken() : null;
     }
 
-    public void setRecord(JSONObject record) {
-        this.record = record;
+    public void setUser(Users user) {
+        this.user = user;
         saveSession();
     }
 
-    public JSONObject getRecord() {
-        return record;
-    }
-
-    public String getUserId() {
-        return record != null ? record.optString("id", "") : "";
-    }
-
-    public String getUserEmail() {
-        return record != null ? record.optString("email", "") : "";
+    public Users getUser() {
+        return user;
     }
 
     public boolean isLoggedIn() {
-        return token != null && !token.isEmpty();
+        return user != null && user.getToken() != null && !user.getToken().isEmpty();
     }
 
     public void clear() {
-        token = null;
-        record = null;
+        user = null;
         prefs.edit().clear().apply();
     }
 }

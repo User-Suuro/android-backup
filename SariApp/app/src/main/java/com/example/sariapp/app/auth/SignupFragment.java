@@ -137,38 +137,44 @@ public class SignupFragment extends Fragment {
     }
 
     private void checkAndHandleExistingUser(String email, String password, String confirm) {
-        crud.list("email", email, new PBCallback() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JSONObject res = new JSONObject(result);
-                    if (res.getJSONArray("items").length() > 0) {
+        crud.listBuilder()
+                .filter("email=\"" + email + "\"")
+                .execute(new PBCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                try {
+                                    JSONObject res = new JSONObject(result);
+                                    if (res.getJSONArray("items").length() > 0) {
 
-                        JSONObject user = res.getJSONArray("items").getJSONObject(0);
-                        boolean verified = user.optBoolean("verified", true); // fallback to true just in case
-                        String id = user.optString("id");
+                                        JSONObject user = res.getJSONArray("items").getJSONObject(0);
+                                        boolean verified = user.optBoolean("verified", true); // fallback to true
+                                        String id = user.optString("id");
 
-                        if (!verified) {
-                            deleteUser(id, () -> createUser(email, password, confirm));
-                        } else {
-                            Dialog.exitLoading();
-                            emailInputLayout.setError("Email Already Exists. Please try logging in");
+                                        if (!verified) {
+                                            deleteUser(id, () -> createUser(email, password, confirm));
+                                        } else {
+                                            Dialog.exitLoading();
+                                            emailInputLayout.setError("Email already exists. Please try logging in.");
+                                        }
+                                    } else {
+                                        createUser(email, password, confirm);
+                                    }
+                                } catch (JSONException e) {
+                                    showError("Error parsing user data.");
+                                }
+                            });
                         }
-
-                    } else {
-                        createUser(email, password, confirm);
                     }
-                } catch (JSONException e) {
-                    showError("Error parsing user data.");
-                }
-            }
 
-            @Override
-            public void onError(String error) {
-                showError("Failed to check user: " + error);
-            }
-        });
+                    @Override
+                    public void onError(String error) {
+                        showError("Failed to check user: " + error);
+                    }
+                });
     }
+
 
     private void deleteUser(String id, Runnable onSuccess) {
         crud.delete(id, new PBCallback() {

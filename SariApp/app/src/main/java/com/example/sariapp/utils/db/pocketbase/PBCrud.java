@@ -2,19 +2,14 @@ package com.example.sariapp.utils.db.pocketbase;
 
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
-import com.example.sariapp.utils.db.pocketbase.PBTypes.PBListCallback;
-import com.example.sariapp.utils.db.pocketbase.PBTypes.PBModelCallback;
-import com.example.sariapp.utils.db.pocketbase.PBTypes.PBRelation;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class PBCrud<T> {
 
@@ -42,69 +37,16 @@ public class PBCrud<T> {
         conn.sendGetRequest(url, authToken, callback);
     }
 
-    public void getById(String id, String token, PBModelCallback callback) {
-        String url = baseUrl + "/api/collections/" + collectionName + "/records/" + id + "?expand=*";
-
-        PBConn.getInstance().sendGetRequest(url, token, new PBCallback() {
-            @Override
-            public void onSuccess(String response) {
-                try {
-                    JSONObject json = new JSONObject(response);
-                    T item = parseModel(json, modelClass);
-                    callback.onSuccess(item);
-                } catch (Exception e) {
-                    callback.onError("Parse error: " + e.getMessage());
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                callback.onError(error);
-            }
-        });
-    }
-
-    public void list(String fieldName, String value, PBCallback callback) {
-        try {
-            String filter = fieldName + "=\"" + value + "\"";
-            String encodedFilter = URLEncoder.encode(filter, "UTF-8");
-            String url = baseUrl + "/api/collections/" + collectionName + "/records?expand=*&filter=" + encodedFilter;
-
-            conn.sendGetRequest(url, authToken, callback);
-        } catch (UnsupportedEncodingException e) {
-            callback.onError("Encoding failed: " + e.getMessage());
-        }
-    }
-
-    public void collectionAsList(String fieldName, String value, PBListCallback<T> callback) {
-        list(fieldName, value, new PBCallback() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JSONObject json = new JSONObject(result);
-                    List<T> list = jsonArrayToList(json);
-                    callback.onSuccess(list);
-                } catch (JSONException e) {
-                    callback.onError("Failed to parse JSON: " + e.getMessage());
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                callback.onError(error);
-            }
-        });
-    }
 
     public void update(String recordId, T model, PBCallback callback) {
         JSONObject json = modelToJson(model);
         String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
-        conn.sendPutRequest(url, json, authToken, callback);
+        conn.sendPutRequest(url, json,  authToken, callback);
     }
 
     public void delete(String recordId, PBCallback callback) {
         String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
-        conn.sendDeleteRequest(url, authToken, callback);
+        conn.sendDeleteRequest(url,  authToken, callback);
     }
 
     private JSONObject modelToJson(T model) {
@@ -119,70 +61,99 @@ public class PBCrud<T> {
                         json.put(annotation.value(), value);
                     }
                 } catch (JSONException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); // You can improve error handling here
                 }
             }
         }
         return json;
     }
 
-    @SuppressWarnings("unchecked")
-    private <R> R parseModel(JSONObject json, Class<?> clazz) throws Exception {
-        Object instance = clazz.getDeclaredConstructor().newInstance();
-
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-
-            if (field.isAnnotationPresent(PBField.class)) {
-                String key = field.getAnnotation(PBField.class).value();
-                Object value = json.opt(key);
-                if (value != null && !JSONObject.NULL.equals(value)) {
-                    field.set(instance, value);
-                }
-            }
-
-            if (field.isAnnotationPresent(PBRelation.class)) {
-                PBRelation rel = field.getAnnotation(PBRelation.class);
-                String key = field.getName();
-
-                JSONObject expandObj = json.optJSONObject("expand");
-                if (expandObj != null) {
-                    if (rel.isList()) {
-                        JSONArray relArray = expandObj.optJSONArray(key);
-                        if (relArray != null) {
-                            List<Object> relList = new ArrayList<>();
-                            for (int i = 0; i < relArray.length(); i++) {
-                                JSONObject relJson = relArray.getJSONObject(i);
-                                Object relObj = parseModel(relJson, rel.relatedType());
-                                relList.add(relObj);
-                            }
-                            field.set(instance, relList);
-                        }
-                    } else {
-                        JSONObject relJson = expandObj.optJSONObject(key);
-                        if (relJson != null) {
-                            Object relObj = parseModel(relJson, rel.relatedType());
-                            field.set(instance, relObj);
-                        }
-                    }
-                }
-            }
-        }
-
-        return (R) instance;
+    public PBListBuilder listBuilder() {
+        return new PBListBuilder();
     }
 
-    private List<T> jsonArrayToList(JSONObject response) {
-        List<T> list = new ArrayList<>();
-        try {
-            JSONArray items = response.getJSONArray("items");
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject obj = items.getJSONObject(i);
-                list.add(parseModel(obj, modelClass));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public class PBListBuilder {
+        private Integer page;
+        private Integer perPage;
+        private String filter;
+        private String sort;
+        private String expand;
+        private String fields;
+        private Boolean skipTotal;
+
+        public PBListBuilder page(int page) {
+            this.page = page;
+            return this;
         }
-        return list;
+
+        public PBListBuilder perPage(int perPage) {
+            this.perPage = perPage;
+            return this;
+        }
+
+        public PBListBuilder filter(String filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        public PBListBuilder sort(String sort) {
+            this.sort = sort;
+            return this;
+        }
+
+        public PBListBuilder expand(String expand) {
+            this.expand = expand;
+            return this;
+        }
+
+        public PBListBuilder fields(String fields) {
+            this.fields = fields;
+            return this;
+        }
+
+        public PBListBuilder skipTotal(boolean skipTotal) {
+            this.skipTotal = skipTotal;
+            return this;
+        }
+
+        public void execute(PBCallback callback) {
+            try {
+                StringBuilder urlBuilder = new StringBuilder(baseUrl)
+                        .append("/api/collections/")
+                        .append(collectionName)
+                        .append("/records?");
+
+                if (page != null) {
+                    urlBuilder.append("page=").append(page).append("&");
+                }
+                if (perPage != null) {
+                    urlBuilder.append("perPage=").append(perPage).append("&");
+                }
+                if (filter != null) {
+                    urlBuilder.append("filter=").append(URLEncoder.encode(filter, "UTF-8")).append("&");
+                }
+                if (sort != null) {
+                    urlBuilder.append("sort=").append(URLEncoder.encode(sort, "UTF-8")).append("&");
+                }
+                if (expand != null) {
+                    urlBuilder.append("expand=").append(URLEncoder.encode(expand, "UTF-8")).append("&");
+                }
+                if (fields != null) {
+                    urlBuilder.append("fields=").append(URLEncoder.encode(fields, "UTF-8")).append("&");
+                }
+                if (skipTotal != null) {
+                    urlBuilder.append("skipTotal=").append(skipTotal).append("&");
+                }
+
+                String url = urlBuilder.toString();
+                if (url.endsWith("&")) {
+                    url = url.substring(0, url.length() - 1);
+                }
+
+                conn.sendGetRequest(url, authToken, callback);
+            } catch (Exception e) {
+                callback.onError("Encoding failed: " + e.getMessage());
+            }
+        }
     }
 }

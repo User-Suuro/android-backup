@@ -15,15 +15,6 @@
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
-        <TextView
-            android:id="@+id/labelRegister"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create Store"
-            android:textSize="@dimen/text_large"
-            android:layout_marginBottom="@dimen/space_medium"
-            />
-
         <!-- Store Name -->
 
         <com.google.android.material.textfield.TextInputLayout
@@ -68,7 +59,6 @@
             android:layout_height="wrap_content"
             android:hint="Establishment Date"
             android:layout_marginBottom="@dimen/space_small"
-            android:focusable="false"
             android:inputType="none"
             app:startIconDrawable="@drawable/ic_calendar_range"
             app:endIconMode="clear_text"

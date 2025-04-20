@@ -4,16 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.sariapp.R;
 import com.example.sariapp.app.auth.FailedFragment;
 import com.example.sariapp.app.auth.LoginFragment;
+import com.example.sariapp.models.Users;
 import com.example.sariapp.utils.EnvConfig;
 import com.example.sariapp.utils.db.pocketbase.PBSession;
 import com.example.sariapp.utils.ui.Router;
-
 import com.example.sariapp.utils.db.pocketbase.PBAuth;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.ui.Dialog;
@@ -65,8 +64,17 @@ public class AuthActivity extends AppCompatActivity {
                                 String newToken = json.getString("token");
                                 JSONObject record = json.getJSONObject("record");
 
-                                session.setToken(newToken);
-                                session.setRecord(record);
+                                // Create a new Users object and set it to the session
+                                Users user = new Users.Builder()
+                                        .id(record.optString("id"))
+                                        .username(record.optString("username"))
+                                        .email(record.optString("email"))
+                                        .token(newToken)
+                                        .build();
+
+
+                                // Save the token and the Users object to PBSession singleton
+                                PBSession.getUserInstance(getApplicationContext()).setUser(user); // Use setUser() to store the Users object
 
                                 Toast.makeText(getApplicationContext(), "User session refreshed", Toast.LENGTH_SHORT).show();
 
@@ -103,8 +111,16 @@ public class AuthActivity extends AppCompatActivity {
                                 String newToken = json.getString("token");
                                 JSONObject record = json.getJSONObject("record");
 
-                                session.setToken(newToken);
-                                session.setRecord(record);
+                                // Create a new Users object for the admin session
+                                Users adminUser = new Users.Builder()
+                                        .id(record.optString("id"))
+                                        .username(record.optString("username"))
+                                        .email(record.optString("email"))
+                                        .token(newToken)
+                                        .build();
+
+                                // Set the admin session token and Users object
+                                PBSession.getAdminInstance(getApplicationContext()).setUser(adminUser); // Use setUser() for storing admin's user data
 
                                 Toast.makeText(getApplicationContext(), "Admin session refreshed", Toast.LENGTH_SHORT).show();
                             } catch (Exception e) {
@@ -142,8 +158,15 @@ public class AuthActivity extends AppCompatActivity {
                             JSONObject record = jsonResponse.getJSONObject("record");
 
                             PBSession session = PBSession.getAdminInstance(getApplicationContext());
-                            session.setToken(authToken);
-                            session.setRecord(record);
+
+                            // Create a Users object for the admin and store it in session
+                            Users adminUser = new Users.Builder()
+                                    .id(record.optString("id"))
+                                    .username(record.optString("username"))
+                                    .email(record.optString("email"))
+                                    .token(authToken)
+                                    .build();
+                            session.setUser(adminUser); // Use setUser() for admin's user data
 
                             Toast.makeText(AuthActivity.this, "Admin connected", Toast.LENGTH_LONG).show();
                         } catch (Exception e) {
@@ -168,5 +191,4 @@ public class AuthActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
 }

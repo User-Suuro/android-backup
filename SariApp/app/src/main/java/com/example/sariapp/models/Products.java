@@ -1,7 +1,6 @@
 package com.example.sariapp.models;
 
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
-import com.example.sariapp.utils.db.pocketbase.PBTypes.PBRelation;
 
 public class Products {
 
@@ -24,7 +23,6 @@ public class Products {
     private int soldQty;
 
     // Assuming this is a relation to the Store model (one-to-one)
-    @PBRelation(relatedType = Stores.class)
     @PBField("store")
     private Stores store; // Reference to the Store object
 

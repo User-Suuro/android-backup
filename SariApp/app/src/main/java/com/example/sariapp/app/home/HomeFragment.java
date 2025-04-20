@@ -1,6 +1,7 @@
 package com.example.sariapp.app.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +14,20 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.sariapp.R;
 import com.example.sariapp.models.Staffs;
 import com.example.sariapp.models.Stores;
+import com.example.sariapp.models.Users;
 import com.example.sariapp.utils.adapter.Pager;
 import com.example.sariapp.utils.db.pocketbase.PBCrud;
 import com.example.sariapp.utils.db.pocketbase.PBSession;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
-import com.example.sariapp.utils.db.pocketbase.PBTypes.PBListCallback;
 import com.example.sariapp.utils.misc.FadePageTransformer;
 import com.example.sariapp.utils.ui.Dialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,49 +66,71 @@ public class HomeFragment extends Fragment {
         List<Staffs> staffList = new ArrayList<>();
 
         String token = PBSession.getUserInstance(getContext()).getToken();
-        String userId = PBSession.getUserInstance(getContext()).getUserId();
+        String userId = PBSession.getUserInstance(getContext()).getUser().getID();
 
         PBCrud<Stores> stores_crud = new PBCrud<>(Stores.class, PBCollection.STORES.getName(), token);
         PBCrud<Staffs> staffs_crud = new PBCrud<>(Staffs.class, PBCollection.STAFFS.getName(), token);
 
         Dialog.showLoading(getContext());
 
-        stores_crud.collectionAsList("owner", userId, new PBListCallback<Stores>() {
-            @Override
-            public void onSuccess(List<Stores> result) {
-                storesList.clear();
-                storesList.addAll(result);
-
-                staffs_crud.collectionAsList("user", userId, new PBListCallback<Staffs>() {
+        stores_crud.listBuilder()
+                .filter("owner=\"" + userId + "\"")
+                .expand("owner") // <--- this is the key!
+                .execute(new PBCallback() {
                     @Override
-                    public void onSuccess(List<Staffs> result) {
-                        staffList.clear();
-                        staffList.addAll(result);
+                    public void onSuccess(String result) {
+                        Dialog.exitLoading();
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                try {
+                                    JSONObject json = new JSONObject(result);
+                                    JSONArray items = json.getJSONArray("items");
 
-                        requireActivity().runOnUiThread(() -> {
-                            Dialog.exitLoading();
+                                    List<Stores> storesList = new ArrayList<>();
+                                    List<Staffs> staffList = new ArrayList<>(); // If you're using this for tabs
 
-                            pager.addFragment(RecyclerStoreStaffFragment.newInstance(storesList, Stores.class), getString(R.string.stores));
-                            pager.addFragment(RecyclerStoreStaffFragment.newInstance(staffList, Staffs.class), getString(R.string.organization));
+                                    for (int i = 0; i < items.length(); i++) {
+                                        JSONObject item = items.getJSONObject(i);
 
-                            new TabLayoutMediator(tabLayout, viewPager,
-                                    (tab, position) -> tab.setText(pager.getPageTitle(position))
-                            ).attach();
-                        });
+                                        Stores store = new Stores.Builder()
+                                                .setId("id")
+                                                .setName(item.optString("name"))
+                                                .setOwner(item.optString("owner"))
+                                                .setDescription(item.optString("description"))
+                                                .setAddress(item.optString("address"))
+                                                .setEstablishmentDate(item.optString("establishment"))
+                                                .setCreated(item.optString("created"))
+                                                .build();
+
+                                        storesList.add(store);
+                                    }
+
+                                    // ⚡ Use the parsed list
+                                    pager.addFragment(RecyclerStoreStaffFragment.newInstance(storesList, Stores.class), getString(R.string.stores));
+                                    pager.addFragment(RecyclerStoreStaffFragment.newInstance(staffList, Staffs.class), getString(R.string.organization));
+
+                                    new TabLayoutMediator(tabLayout, viewPager,
+                                            (tab, position) -> tab.setText(pager.getPageTitle(position))
+                                    ).attach();
+
+                                } catch (JSONException e) {
+                                    Log.e("hatdog_json_error", "Parsing failed: " + e.getMessage());
+                                }
+                            });
+                        }
                     }
 
                     @Override
                     public void onError(String error) {
-                        // TODO: handle staff load error
+                        Dialog.exitLoading();
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                Log.d("hatdog_error", error);
+                            });
+                        }
                     }
                 });
-            }
 
-            @Override
-            public void onError(String error) {
-                // TODO: handle store load error
-            }
-        });
 
         return view;
     }
