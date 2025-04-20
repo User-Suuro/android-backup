@@ -3,6 +3,7 @@ package com.example.sariapp.models;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 
 public class Staffs {
+
     @PBField("id")
     private String id;
 
@@ -20,6 +21,16 @@ public class Staffs {
 
     @PBField("updated")
     private String updated;
+
+    // Static field name constants
+    public static class Fields {
+        public static final String ID = "id";
+        public static final String USER = "user";
+        public static final String STORE = "store";
+        public static final String IS_ACTIVE = "is_active";
+        public static final String CREATED = "created";
+        public static final String UPDATED = "updated";
+    }
 
     // Private constructor for builder
     private Staffs(Builder builder) {

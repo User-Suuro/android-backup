@@ -18,6 +18,7 @@ public class Stores {
 
     @PBField("address")
     private String address;
+
     @PBField("establishment")
     private String establishmentDate;
 
@@ -35,6 +36,21 @@ public class Stores {
 
     @PBField("created")
     private String created; // ISO 8601
+
+    // Static field name constants
+    public static class Fields {
+        public static final String ID = "id";
+        public static final String NAME = "name";
+        public static final String OWNER = "owner";
+        public static final String DESCRIPTION = "description";
+        public static final String ADDRESS = "address";
+        public static final String ESTABLISHMENT = "establishment";
+        public static final String LOCATION_X = "location_x";
+        public static final String LOCATION_Y = "location_y";
+        public static final String LOCATION_Z = "location_z";
+        public static final String ZIPCODE = "zipcode";
+        public static final String CREATED = "created";
+    }
 
     // Empty constructor for reflection
     public Stores() {}

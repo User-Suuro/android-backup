@@ -121,13 +121,12 @@ public class CreateStoreFragment extends Fragment {
 
             Stores store = new Stores.Builder()
                     .setName(storeName)
-                    .setOwner(PBSession.getUserInstance(getContext()).getUser().getID())
+                    .setOwner(PBSession.getUserInstance(getContext()).getUser().getId())
                     .setDescription(storeDescription)
                     .setAddress(storeAddress)
                     .setEstablishmentDate(dateOfEstablishment)
                     .build();
 
-            Toast.makeText(getContext(), String.valueOf(PBSession.getUserInstance(getContext()).getUser().getID()), Toast.LENGTH_SHORT).show();
 
             Dialog.showLoading(getContext());
 

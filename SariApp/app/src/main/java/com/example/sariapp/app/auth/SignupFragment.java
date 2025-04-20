@@ -150,7 +150,7 @@ public class SignupFragment extends Fragment {
 
                                         JSONObject user = res.getJSONArray("items").getJSONObject(0);
                                         boolean verified = user.optBoolean("verified", true); // fallback to true
-                                        String id = user.optString("id");
+                                        String id = user.optString(Users.Fields.ID);
 
                                         if (!verified) {
                                             deleteUser(id, () -> createUser(email, password, confirm));
@@ -203,7 +203,7 @@ public class SignupFragment extends Fragment {
         Users users = new Users.Builder()
                 .email(email)
                 .password(password)
-                .confirmPassword(confirm)
+                .passwordConfirm(confirm)
                 .build();
 
         crud.create(users, new PBCallback() {

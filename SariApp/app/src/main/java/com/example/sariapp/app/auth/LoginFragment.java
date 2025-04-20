@@ -103,10 +103,10 @@ public class LoginFragment extends Fragment {
 
                             // Build the Users model using the Builder pattern
                             Users user = new Users.Builder()
-                                    .id(record.optString("id"))
-                                    .username(jsonResponse.optString("username"))
-                                    .email(jsonResponse.optString("email"))
-                                    .token(token)
+                                    .id(record.optString(Users.Fields.ID))
+                                    .name(jsonResponse.optString(Users.Fields.NAME))
+                                    .email(jsonResponse.optString(Users.Fields.EMAIL))
+                                    .tokenKey(token)
                                     .build();
 
                             // Save the token and the Users object to PBSession singleton

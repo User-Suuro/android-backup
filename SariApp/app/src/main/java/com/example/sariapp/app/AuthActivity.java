@@ -66,12 +66,11 @@ public class AuthActivity extends AppCompatActivity {
 
                                 // Create a new Users object and set it to the session
                                 Users user = new Users.Builder()
-                                        .id(record.optString("id"))
-                                        .username(record.optString("username"))
-                                        .email(record.optString("email"))
-                                        .token(newToken)
+                                        .id(record.optString(Users.Fields.ID))
+                                        .name(record.optString(Users.Fields.NAME))
+                                        .email(record.optString(Users.Fields.EMAIL))
+                                        .tokenKey(newToken)
                                         .build();
-
 
                                 // Save the token and the Users object to PBSession singleton
                                 PBSession.getUserInstance(getApplicationContext()).setUser(user); // Use setUser() to store the Users object
@@ -113,10 +112,10 @@ public class AuthActivity extends AppCompatActivity {
 
                                 // Create a new Users object for the admin session
                                 Users adminUser = new Users.Builder()
-                                        .id(record.optString("id"))
-                                        .username(record.optString("username"))
-                                        .email(record.optString("email"))
-                                        .token(newToken)
+                                        .id(record.optString(Users.Fields.ID))
+                                        .name(record.optString(Users.Fields.NAME))
+                                        .email(record.optString(Users.Fields.EMAIL))
+                                        .tokenKey(newToken)
                                         .build();
 
                                 // Set the admin session token and Users object
@@ -161,10 +160,10 @@ public class AuthActivity extends AppCompatActivity {
 
                             // Create a Users object for the admin and store it in session
                             Users adminUser = new Users.Builder()
-                                    .id(record.optString("id"))
-                                    .username(record.optString("username"))
-                                    .email(record.optString("email"))
-                                    .token(authToken)
+                                    .id(record.optString(Users.Fields.ID))
+                                    .name(record.optString(Users.Fields.NAME))
+                                    .email(record.optString(Users.Fields.EMAIL))
+                                    .tokenKey(authToken)
                                     .build();
                             session.setUser(adminUser); // Use setUser() for admin's user data
 

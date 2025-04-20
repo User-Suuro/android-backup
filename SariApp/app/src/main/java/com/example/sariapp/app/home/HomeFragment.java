@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment {
         List<Staffs> staffList = new ArrayList<>();
 
         String token = PBSession.getUserInstance(getContext()).getToken();
-        String userId = PBSession.getUserInstance(getContext()).getUser().getID();
+        String userId = PBSession.getUserInstance(getContext()).getUser().getId();
 
         PBCrud<Stores> stores_crud = new PBCrud<>(Stores.class, PBCollection.STORES.getName(), token);
         PBCrud<Staffs> staffs_crud = new PBCrud<>(Staffs.class, PBCollection.STAFFS.getName(), token);
@@ -93,13 +93,13 @@ public class HomeFragment extends Fragment {
                                         JSONObject item = items.getJSONObject(i);
 
                                         Stores store = new Stores.Builder()
-                                                .setId("id")
-                                                .setName(item.optString("name"))
-                                                .setOwner(item.optString("owner"))
-                                                .setDescription(item.optString("description"))
-                                                .setAddress(item.optString("address"))
-                                                .setEstablishmentDate(item.optString("establishment"))
-                                                .setCreated(item.optString("created"))
+                                                .setId(Stores.Fields.ID)
+                                                .setName(item.optString(Stores.Fields.NAME))
+                                                .setOwner(item.optString(Stores.Fields.OWNER))
+                                                .setDescription(item.optString(Stores.Fields.DESCRIPTION))
+                                                .setAddress(item.optString(Stores.Fields.ADDRESS))
+                                                .setEstablishmentDate(item.optString(Stores.Fields.ESTABLISHMENT))
+                                                .setCreated(item.optString(Stores.Fields.CREATED))
                                                 .build();
 
                                         storesList.add(store);
@@ -114,7 +114,7 @@ public class HomeFragment extends Fragment {
                                     ).attach();
 
                                 } catch (JSONException e) {
-                                    Log.e("hatdog_json_error", "Parsing failed: " + e.getMessage());
+                                    Log.e("debug", "Parsing failed: " + e.getMessage());
                                 }
                             });
                         }
@@ -125,7 +125,7 @@ public class HomeFragment extends Fragment {
                         Dialog.exitLoading();
                         if (isAdded()) {
                             requireActivity().runOnUiThread(() -> {
-                                Log.d("hatdog_error", error);
+                                Log.d("debug", error);
                             });
                         }
                     }

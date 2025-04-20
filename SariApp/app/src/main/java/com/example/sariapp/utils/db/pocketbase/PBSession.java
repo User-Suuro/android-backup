@@ -50,10 +50,10 @@ public class PBSession {
             try {
                 JSONObject record = new JSONObject(recordStr);
                 user = new Users.Builder()
-                        .id(record.optString("id"))
-                        .username(record.optString("username"))
-                        .email(record.optString("email"))
-                        .token(record.optString("token"))
+                        .id(record.optString(Users.Fields.ID))
+                        .name(record.optString(Users.Fields.NAME))
+                        .email(record.optString(Users.Fields.EMAIL))
+                        .tokenKey(record.optString(Users.Fields.TOKEN_KEY))
                         .build();
             } catch (JSONException e) {
                 Log.e("PBSession", "Failed to parse saved record JSON", e);
@@ -66,10 +66,10 @@ public class PBSession {
         if (user != null) {
             try {
                 JSONObject recordJson = new JSONObject();
-                recordJson.put("id", user.getID());
-                recordJson.put("username", user.getUsername());
-                recordJson.put("email", user.getEmail());
-                recordJson.put("token", user.getToken());
+                recordJson.put(Users.Fields.ID, user.getId());
+                recordJson.put(Users.Fields.NAME, user.getName());
+                recordJson.put(Users.Fields.EMAIL, user.getEmail());
+                recordJson.put(Users.Fields.TOKEN_KEY, user.getTokenKey());
                 editor.putString(KEY_RECORD, recordJson.toString());
             } catch (JSONException e) {
                 Log.e("PBSession", "Failed to convert Users model to JSON", e);
@@ -81,7 +81,7 @@ public class PBSession {
     }
 
     public String getToken() {
-        return user != null ? user.getToken() : null;
+        return user != null ? user.getTokenKey() : null;
     }
 
     public void setUser(Users user) {
@@ -94,7 +94,7 @@ public class PBSession {
     }
 
     public boolean isLoggedIn() {
-        return user != null && user.getToken() != null && !user.getToken().isEmpty();
+        return user != null && user.getTokenKey() != null && !user.getTokenKey().isEmpty();
     }
 
     public void clear() {

@@ -149,7 +149,7 @@ public class VerifyFragment extends Fragment {
                         requireActivity().runOnUiThread(() -> {
 
                             Dialog.exitLoading();
-                            Toast.makeText(getContext(), "OTP Verified!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.otp_verified), Toast.LENGTH_SHORT).show();
                             Router router = new Router(requireActivity().getSupportFragmentManager());
                             router.switchFragment(new SuccessFragment(), false, R.id.auth_container);
 

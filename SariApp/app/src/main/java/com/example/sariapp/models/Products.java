@@ -22,18 +22,31 @@ public class Products {
     @PBField("sold_qty")
     private int soldQty;
 
-    // Assuming this is a relation to the Store model (one-to-one)
     @PBField("store")
-    private Stores store; // Reference to the Store object
+    private Stores store;
 
     @PBField("created_by")
     private String createdBy;
 
     @PBField("created")
-    private String created; // ISO 8601 format
+    private String created;
 
     @PBField("updated")
-    private String updated; // ISO 8601 format
+    private String updated;
+
+    // Static field name constants
+    public static class Fields {
+        public static final String ID = "id";
+        public static final String NAME = "name";
+        public static final String DESCRIPTION = "description";
+        public static final String PRICE_PER_QTY = "price_per_qty";
+        public static final String AVAIL_QTY = "avail_qty";
+        public static final String SOLD_QTY = "sold_qty";
+        public static final String STORE = "store";
+        public static final String CREATED_BY = "created_by";
+        public static final String CREATED = "created";
+        public static final String UPDATED = "updated";
+    }
 
     // Constructors
     public Products() {}
