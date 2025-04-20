@@ -1,10 +1,10 @@
 package com.example.sariapp.utils.db.pocketbase;
 
-import android.content.Context;
-
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBListCallback;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBModelCallback;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBRelation;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,12 +42,33 @@ public class PBCrud<T> {
         conn.sendGetRequest(url, authToken, callback);
     }
 
+    public void getById(String id, String token, PBModelCallback callback) {
+        String url = baseUrl + "/api/collections/" + collectionName + "/records/" + id + "?expand=*";
+
+        PBConn.getInstance().sendGetRequest(url, token, new PBCallback() {
+            @Override
+            public void onSuccess(String response) {
+                try {
+                    JSONObject json = new JSONObject(response);
+                    T item = parseModel(json, modelClass);
+                    callback.onSuccess(item);
+                } catch (Exception e) {
+                    callback.onError("Parse error: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                callback.onError(error);
+            }
+        });
+    }
+
     public void list(String fieldName, String value, PBCallback callback) {
-        // Create the URL with a filter for the specified field
         try {
             String filter = fieldName + "=\"" + value + "\"";
             String encodedFilter = URLEncoder.encode(filter, "UTF-8");
-            String url = baseUrl + "/api/collections/" + collectionName + "/records?filter=" + encodedFilter;
+            String url = baseUrl + "/api/collections/" + collectionName + "/records?expand=*&filter=" + encodedFilter;
 
             conn.sendGetRequest(url, authToken, callback);
         } catch (UnsupportedEncodingException e) {
@@ -75,16 +96,15 @@ public class PBCrud<T> {
         });
     }
 
-
     public void update(String recordId, T model, PBCallback callback) {
         JSONObject json = modelToJson(model);
         String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
-        conn.sendPutRequest(url, json,  authToken, callback);
+        conn.sendPutRequest(url, json, authToken, callback);
     }
 
     public void delete(String recordId, PBCallback callback) {
         String url = baseUrl + "/api/collections/" + collectionName + "/records/" + recordId;
-        conn.sendDeleteRequest(url,  authToken, callback);
+        conn.sendDeleteRequest(url, authToken, callback);
     }
 
     private JSONObject modelToJson(T model) {
@@ -99,29 +119,57 @@ public class PBCrud<T> {
                         json.put(annotation.value(), value);
                     }
                 } catch (JSONException | IllegalAccessException e) {
-                    e.printStackTrace(); // You can improve error handling here
+                    e.printStackTrace();
                 }
             }
         }
         return json;
     }
 
-    private T jsonToModel(JSONObject json) {
-        try {
-            T instance = modelClass.newInstance();
-            for (Field field : modelClass.getDeclaredFields()) {
-                if (field.isAnnotationPresent(PBField.class)) {
-                    PBField annotation = field.getAnnotation(PBField.class);
-                    field.setAccessible(true);
-                    Object value = json.opt(annotation.value());
-                    if (value != null) field.set(instance, value);
+    @SuppressWarnings("unchecked")
+    private <R> R parseModel(JSONObject json, Class<?> clazz) throws Exception {
+        Object instance = clazz.getDeclaredConstructor().newInstance();
+
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+
+            if (field.isAnnotationPresent(PBField.class)) {
+                String key = field.getAnnotation(PBField.class).value();
+                Object value = json.opt(key);
+                if (value != null && !JSONObject.NULL.equals(value)) {
+                    field.set(instance, value);
                 }
             }
-            return instance;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+
+            if (field.isAnnotationPresent(PBRelation.class)) {
+                PBRelation rel = field.getAnnotation(PBRelation.class);
+                String key = field.getName();
+
+                JSONObject expandObj = json.optJSONObject("expand");
+                if (expandObj != null) {
+                    if (rel.isList()) {
+                        JSONArray relArray = expandObj.optJSONArray(key);
+                        if (relArray != null) {
+                            List<Object> relList = new ArrayList<>();
+                            for (int i = 0; i < relArray.length(); i++) {
+                                JSONObject relJson = relArray.getJSONObject(i);
+                                Object relObj = parseModel(relJson, rel.relatedType());
+                                relList.add(relObj);
+                            }
+                            field.set(instance, relList);
+                        }
+                    } else {
+                        JSONObject relJson = expandObj.optJSONObject(key);
+                        if (relJson != null) {
+                            Object relObj = parseModel(relJson, rel.relatedType());
+                            field.set(instance, relObj);
+                        }
+                    }
+                }
+            }
         }
+
+        return (R) instance;
     }
 
     private List<T> jsonArrayToList(JSONObject response) {
@@ -130,12 +178,11 @@ public class PBCrud<T> {
             JSONArray items = response.getJSONArray("items");
             for (int i = 0; i < items.length(); i++) {
                 JSONObject obj = items.getJSONObject(i);
-                list.add(jsonToModel(obj));
+                list.add(parseModel(obj, modelClass));
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
-
 }

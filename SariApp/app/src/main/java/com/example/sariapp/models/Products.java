@@ -1,7 +1,7 @@
 package com.example.sariapp.models;
 
-
 import com.example.sariapp.utils.db.pocketbase.PBTypes.PBField;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBRelation;
 
 public class Products {
 
@@ -23,22 +23,24 @@ public class Products {
     @PBField("sold_qty")
     private int soldQty;
 
+    // Assuming this is a relation to the Store model (one-to-one)
+    @PBRelation(relatedType = Stores.class)
     @PBField("store")
-    private String store; // assuming this is the store ID
+    private Stores store; // Reference to the Store object
 
     @PBField("created_by")
     private String createdBy;
 
     @PBField("created")
-    private String created; // ISO string
+    private String created; // ISO 8601 format
 
     @PBField("updated")
-    private String updated; // ISO string
+    private String updated; // ISO 8601 format
 
-    public Products() {
-        // Empty constructor
-    }
+    // Constructors
+    public Products() {}
 
+    // Fluent Setters
     public Products setName(String name) {
         this.name = name;
         return this;
@@ -64,7 +66,7 @@ public class Products {
         return this;
     }
 
-    public Products setStore(String store) {
+    public Products setStore(Stores store) {
         this.store = store;
         return this;
     }
@@ -84,15 +86,44 @@ public class Products {
         return this;
     }
 
-    // Getters (optional)
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public double getPricePerQty() { return pricePerQty; }
-    public int getAvailQty() { return availQty; }
-    public int getSoldQty() { return soldQty; }
-    public String getStore() { return store; }
-    public String getCreatedBy() { return createdBy; }
-    public String getCreated() { return created; }
-    public String getUpdated() { return updated; }
+    // Getters
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getPricePerQty() {
+        return pricePerQty;
+    }
+
+    public int getAvailQty() {
+        return availQty;
+    }
+
+    public int getSoldQty() {
+        return soldQty;
+    }
+
+    public Stores getStore() {
+        return store;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public String getUpdated() {
+        return updated;
+    }
 }

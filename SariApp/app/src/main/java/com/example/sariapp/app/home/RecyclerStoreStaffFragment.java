@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -76,12 +77,17 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
                 R.layout.recycler_item_store_staff, // Use your actual layout file
                 (itemView, item, position) -> {
                     // Example binding logic
-                    // You can do instanceof check to customize based on class
+                    // You can do instanceof check to customize based on class\
+                    ImageView ic_placeholder = itemView.findViewById(R.id.icon_placeholder);
+                    TextView name = itemView.findViewById(R.id.label_store_name);
+                    TextView type = itemView.findViewById(R.id.label_type);
 
                     if (item instanceof Stores) {
+                        name.setText(((Stores) item).getName());
+                        type.setText("Owner");
 
                     } else if (item instanceof Staffs) {
-
+                        name.setText(((Staffs) item).getStore());
                     }
                 }
         );
