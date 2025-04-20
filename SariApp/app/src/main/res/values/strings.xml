@@ -39,5 +39,9 @@
     <string name="click_here_to_create_a_store">Click here to create a store</string>
     <string name="no_organization_found">No Organization found</string>
     <string name="click_here_to_join_to_another_store">Click here to join to another store</string>
+    <string name="required_field">Required</string>
+    <string name="password_mismatch">Password does not match</string>
+    <string name="select_date_of_establishment">Select Date of Establishment</string>
+    <string name="mm_dd_yyyy">MM/dd/yyyy</string>
 
 </resources>

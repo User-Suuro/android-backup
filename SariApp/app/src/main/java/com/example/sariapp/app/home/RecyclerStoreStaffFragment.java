@@ -40,7 +40,6 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
     public static <T> RecyclerStoreStaffFragment<T> newInstance(List<T> data, Class<T> type) {
         Gson gson = new Gson();
         String json = gson.toJson(data);
-
         RecyclerStoreStaffFragment<T> fragment = new RecyclerStoreStaffFragment<>(type);
         Bundle args = new Bundle();
         args.putString(ARG_DATA, json);
@@ -51,7 +50,6 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             String json = getArguments().getString(ARG_DATA);
             Type listType = TypeToken.getParameterized(List.class, type).getType();
@@ -70,6 +68,8 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
         LinearLayout unavailableContainer = view.findViewById(R.id.unavailable_container);
         TextView unavailableText = view.findViewById(R.id.unavailable_text);
         Button unavailableButton = view.findViewById(R.id.unavailable_button);
+        FloatingActionButton fab = view.findViewById(R.id.fab_create);
+        Router router = new Router(requireActivity().getSupportFragmentManager());
 
         Recycler<T> adapter = new Recycler<>(
                 requireContext(),
@@ -94,11 +94,6 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
 
         recyclerView.setAdapter(adapter);
 
-        FloatingActionButton fab = view.findViewById(R.id.fab_create);
-
-        Router router = new Router(requireActivity().getSupportFragmentManager());
-
-
         if (type == Stores.class) {
             fab.setOnClickListener(v -> {
                 // go to create store if store
@@ -109,11 +104,15 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
                 unavailableContainer.setVisibility(View.VISIBLE);
                 unavailableText.setText(getString(R.string.there_are_no_stores_available));
                 unavailableButton.setText(getString(R.string.click_here_to_create_a_store));
+
+                unavailableButton.setOnClickListener(v-> {
+                    router.switchFragment(CreateStoreFragment.newInstance(), true, R.id.main_activity_container);
+                });
+
                 fab.setVisibility(View.GONE);
             } else {
                 unavailableContainer.setVisibility(View.GONE);
             }
-
 
         } else if (type == Staffs.class) {
             // show staff-specific button
@@ -121,19 +120,19 @@ public class RecyclerStoreStaffFragment<T> extends Fragment {
                 router.switchFragment(JoinStoreFragment.newInstance(), true, R.id.main_activity_container);
             });
 
-
             if (argData.isEmpty()) {
                 unavailableContainer.setVisibility(View.VISIBLE);
                 unavailableText.setText(getString(R.string.no_organization_found));
                 unavailableButton.setText(getString(R.string.click_here_to_join_to_another_store));
+                unavailableButton.setOnClickListener(v-> {
+                    router.switchFragment(JoinStoreFragment.newInstance(), true, R.id.main_activity_container);
+                });
+
                 fab.setVisibility(View.GONE);
             } else {
                 unavailableContainer.setVisibility(View.GONE);
             }
-
-
         }
-
 
         return view;
     }

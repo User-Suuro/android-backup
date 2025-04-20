@@ -7,12 +7,22 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.sariapp.R;
+import com.example.sariapp.models.Stores;
+import com.example.sariapp.utils.db.pocketbase.PBCrud;
+import com.example.sariapp.utils.db.pocketbase.PBSession;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCallback;
+import com.example.sariapp.utils.db.pocketbase.PBTypes.PBCollection;
+import com.example.sariapp.utils.ui.Dialog;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -67,23 +77,97 @@ public class CreateStoreFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_create_store, container, false);
 
+        TextInputLayout layoutStoreName = view.findViewById(R.id.inputStoreName);
+        TextInputLayout layoutStoreDescription = view.findViewById(R.id.inputStoreDescription);
+        TextInputLayout layoutStoreAddress = view.findViewById(R.id.inputStoreAddress);
         TextInputLayout layoutDoE = view.findViewById(R.id.inputDateEstablishment);
-        TextInputEditText etDoE = view.findViewById(R.id.etDoE);
+        Button btnCreateStore = view.findViewById(R.id.btnCreateStore);
+
+        EditText etStoreName = layoutStoreName.getEditText();
+        EditText etStoreDescription = layoutStoreDescription.getEditText();
+        EditText etStoreAddress = layoutStoreAddress.getEditText();
+        EditText etDoE = layoutDoE.getEditText();
 
         etDoE.setOnClickListener(v -> {
             MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                    .setTitleText("Select Date of Establishment")
+                    .setTitleText(getString(R.string.select_date_of_establishment))
                     .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                     .build();
 
             datePicker.show(getParentFragmentManager(), "doe_picker");
 
             datePicker.addOnPositiveButtonClickListener(selection -> {
-                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.mm_dd_yyyy), Locale.getDefault());
                 String formattedDate = sdf.format(new Date(selection));
                 etDoE.setText(formattedDate);
             });
         });
+
+        btnCreateStore.setOnClickListener(v-> {
+            String storeName = etStoreName.getText().toString();
+            String storeDescription = etStoreDescription.getText().toString();
+            String storeAddress = etStoreAddress.getText().toString();
+            String dateOfEstablishment = etDoE.getText().toString();
+
+            // Checkers
+
+            if (storeName.isEmpty()) {
+                layoutStoreName.setError(getString(R.string.required_field));
+                return;
+            }
+
+            if (storeDescription.isEmpty()) {
+                layoutStoreDescription.setError(getString(R.string.required_field));
+                return;
+            }
+
+            if (storeAddress.isEmpty()) {
+                layoutStoreAddress.setError(getString(R.string.required_field));
+                return;
+            }
+
+            if (dateOfEstablishment.isEmpty()) {
+                layoutDoE.setError(getString(R.string.required_field));
+                return;
+            }
+
+            PBCrud<Stores> stores_crud = new PBCrud<>(Stores.class, PBCollection.STORES.getName(), PBSession.getUserInstance(getContext()).getToken());
+            Stores store = new Stores.Builder()
+                    .name(storeName)
+                    .owner(PBSession.getUserInstance(getContext()).getUserId())
+                    .description(storeDescription)
+                    .address(storeAddress)
+                    .establishment(dateOfEstablishment)
+                    .build();
+
+            Dialog.showLoading(getContext());
+
+            stores_crud.create(store, new PBCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    // success
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> {
+                            Dialog.exitLoading();
+                            Toast.makeText(getContext(), "Store Successfully Added", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    // error
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> {
+                            Dialog.exitLoading();
+                            Dialog.showError(getContext(), error, null);
+                        });
+                    }
+
+                }
+            });
+        });
+
 
         return view;
     }
