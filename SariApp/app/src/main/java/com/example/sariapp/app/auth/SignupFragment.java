@@ -97,6 +97,28 @@ public class SignupFragment extends Fragment {
                 String password = passInput.getText().toString().trim();
                 String confirm = confirmInput.getText().toString().trim();
 
+                // Checkers
+
+                if (email.isEmpty()) {
+                    emailInputLayout.setError(getString(R.string.required_field));
+                    return;
+                }
+
+                if (password.isEmpty()) {
+                    passInputLayout.setError(getString(R.string.required_field));
+                    return;
+                }
+
+                if (confirm.isEmpty()) {
+                    confirmInputLayout.setError(getString(R.string.required_field));
+                    return;
+                }
+
+                if (!password.equals(confirm)) {
+                    confirmInputLayout.setError(getString(R.string.password_mismatch));
+                    return;
+                }
+
                 Dialog.showLoading(getContext());
                 checkAndHandleExistingUser(email, password, confirm);
             }
